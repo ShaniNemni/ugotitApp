@@ -1,0 +1,12 @@
+{
+  "name": "ugotit-project",
+  "displayName": "ugotit-project",
+  "expo": {
+    "name": "ugotit-project",
+    "slug": "ugotit-project",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
