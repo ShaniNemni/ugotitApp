@@ -3,6 +3,7 @@ import {View,StyleSheet,TouchableOpacity,Image} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import { GRAY_BACKGROUND, PURPLE_BACKGROUND, WHITE_COLOR } from '../utils/localStorage/colors/Colors';
 import { getImage } from '../utils/images/Images';
+import {Icon} from 'native-base';
 
 const defaultImage = getImage('defaultProfile');
 
@@ -17,7 +18,8 @@ const options = {
 
 const ProfileImage = ({}) => {
 
-    const [profileImage,setProfileImage] = useState(defaultImage);
+   const [profileImage,setProfileImage] = useState(defaultImage);
+   const [iconName,setIconName] = useState('plus');
 
    const showImagePicker = () => {
         ImagePicker.showImagePicker(options, (response) => {
@@ -32,18 +34,18 @@ const ProfileImage = ({}) => {
                 console.log("source ",source);
               // You can also display the image using data:
               // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-              setProfileImage(source)
+              setProfileImage(source);
+              setIconName('pencil');
             }
           });
     }
 
-    console.log("profileImage ",profileImage);
     return(
         <View style={[styles.profileImageView,styles.borderStyle,styles.shadow]}>
             <Image source={profileImage} style={styles.avatar} />
 
             <TouchableOpacity onPress={() => showImagePicker()} style={[styles.iconView,styles.borderStyle]}>
-
+                <Icon name={iconName} type={"MaterialCommunityIcons"} style={styles.iconStyle}/>
             </TouchableOpacity>
         </View>
     )
@@ -76,7 +78,10 @@ const styles = StyleSheet.create ({
         width:55,
         height:55,
         borderRadius:55/2,
-        backgroundColor:PURPLE_BACKGROUND
+        backgroundColor:PURPLE_BACKGROUND,        
+        justifyContent:'center',
+        alignItems:'center',
+
     },
     shadow:{
         shadowColor:"#000",
@@ -87,5 +92,11 @@ const styles = StyleSheet.create ({
         shadowOpacity:0.25,
         shadowRadius:10.32,
         elevation: 2
+    },
+    iconStyle:{
+        fontSize:35,
+        justifyContent:'center',
+        alignContent:'center',
+        color:WHITE_COLOR
     }
 })
