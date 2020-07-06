@@ -6,7 +6,8 @@ import { getImage } from '../utils/images/Images';
 import {Icon} from 'native-base';
 
 const defaultImage = getImage('defaultProfile');
-
+const PROFILE_IMAGE_WIDTH = 131;
+const PROFILE_IMAGE_HEIGHT = 129;
 const options = {
     title: 'Select Avatar',
     storageOptions: {
@@ -55,9 +56,9 @@ export default ProfileImage;
 
 const styles = StyleSheet.create ({
     profileImageView:{
-        width:131,
-        height:129,
-        borderRadius:80,
+        width:PROFILE_IMAGE_WIDTH,
+        height:PROFILE_IMAGE_HEIGHT,
+        borderRadius:PROFILE_IMAGE_WIDTH/2,
         backgroundColor:GRAY_BACKGROUND,
         alignSelf:'center',
         justifyContent:'center',
@@ -65,7 +66,10 @@ const styles = StyleSheet.create ({
         marginVertical:10
     },
     avatar:{
-        resizeMode:'contain',
+        //resizeMode:'contain',
+        width:PROFILE_IMAGE_WIDTH,
+        borderRadius:PROFILE_IMAGE_WIDTH/2,
+        height:PROFILE_IMAGE_HEIGHT,
     },
     borderStyle:{
         borderWidth:4,
