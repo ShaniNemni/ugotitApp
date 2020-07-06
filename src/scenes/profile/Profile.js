@@ -99,8 +99,10 @@ const Profile = observer (({navigation}) => {
     const placeholder = userExist ? username : YOUR_NAME_PLACEHOLDER;
     return(
         <View style={styles.profileView}>
-            <ProfileImage saveImage={saveImage} iconName={iconName} profileImage={profileImage} profileImageExist={profileImageExist}/>
-            <View style={{marginVertical:50}}>
+            <View style={[styles.profilePosition]}>
+                <ProfileImage saveImage={saveImage} iconName={iconName} profileImage={profileImage} profileImageExist={profileImageExist}/>
+            </View>
+            <View style={{marginVertical:'40%'}}>
                 <CustomTextInput placeholder={placeholder} onChangeText={text => onUsernameChange(text)}/>
             </View>
             <View style={[styles.buttonPosition]}>
@@ -124,6 +126,11 @@ const styles = StyleSheet.create({
     buttonPosition:{
         position:'absolute',
         bottom:'5%'
+    },
+    profilePosition:{
+        position:'absolute',
+        top:-50,
+        zIndex:20
     },
     errorDisplayPosition:{
         position:'absolute',
