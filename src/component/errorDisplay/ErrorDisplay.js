@@ -26,8 +26,6 @@ const styles = StyleSheet.create({
         backgroundColor:ERROR_BACKGROUND,
         justifyContent:'flex-end',
         alignSelf:'center',
-        position:'absolute',
-        bottom:'10%'
     },
     errorIconAndText:{
         flexDirection:'row',
