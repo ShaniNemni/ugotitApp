@@ -8,6 +8,7 @@ import {Icon} from 'native-base';
 const defaultImage = getImage('defaultProfile');
 const PROFILE_IMAGE_WIDTH = 131;
 const PROFILE_IMAGE_HEIGHT = 129;
+
 const options = {
     title: 'Select Avatar',
     storageOptions: {
@@ -32,9 +33,6 @@ const ProfileImage = ({}) => {
               console.log('ImagePicker Error: ', response.error);
             } else {
               const source = { uri: response.uri };
-                console.log("source ",source);
-              // You can also display the image using data:
-              // const source = { uri: 'data:image/jpeg;base64,' + response.data };
               setProfileImage(source);
               setIconName('pencil');
             }
