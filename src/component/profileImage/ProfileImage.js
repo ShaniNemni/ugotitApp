@@ -1,9 +1,10 @@
 import React , {useState} from 'react';
 import {View,StyleSheet,TouchableOpacity,Image} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
-import { GRAY_BACKGROUND, PURPLE_BACKGROUND, WHITE_COLOR } from '../utils/localStorage/colors/Colors';
-import { getImage } from '../utils/images/Images';
+import { GRAY_BACKGROUND, PURPLE_BACKGROUND, WHITE_COLOR } from '../../utils/localStorage/colors/Colors';
+import { getImage } from '../../utils/images/Images';
 import {Icon} from 'native-base';
+import ErrorDisplay from '../errorDisplay/ErrorDisplay';
 
 const defaultImage = getImage('defaultProfile');
 const PROFILE_IMAGE_WIDTH = 131;
@@ -22,30 +23,40 @@ const ProfileImage = ({}) => {
 
    const [profileImage,setProfileImage] = useState(defaultImage);
    const [iconName,setIconName] = useState('plus');
+   const [displayError,setDisplayError] = useState(false);
+   const [errorMessage,setErrorMessage] = useState('');
 
    const showImagePicker = () => {
         ImagePicker.showImagePicker(options, (response) => {
             console.log('Response = ', response);
-           
+            let errorMessageDisplay = '';
             if (response.didCancel) {
-              console.log('User cancelled image picker');
+              errorMessageDisplay = 'עליך לבחור תמונה על מנת להתקדם לשלב הבא';
+              setErrorMessage(errorMessageDisplay);
+              setDisplayError(true);
             } else if (response.error) {
               console.log('ImagePicker Error: ', response.error);
+              errorMessageDisplay = 'שגיאה בעת העלאת התמונה'
+              setErrorMessage(errorMessageDisplay);
+              setDisplayError(true);
             } else {
               const source = { uri: response.uri };
               setProfileImage(source);
               setIconName('pencil');
+              setDisplayError(false);
             }
           });
     }
 
     return(
-        <View style={[styles.profileImageView,styles.borderStyle,styles.shadow]}>
-            <Image source={profileImage} style={styles.avatar} />
+        <View>
+            <View style={[styles.profileImageView,styles.borderStyle,styles.shadow]}>
+                <Image source={profileImage} style={styles.avatar} />
 
-            <TouchableOpacity onPress={() => showImagePicker()} style={[styles.iconView,styles.borderStyle]}>
-                <Icon name={iconName} type={"MaterialCommunityIcons"} style={styles.iconStyle}/>
-            </TouchableOpacity>
+                <TouchableOpacity onPress={() => showImagePicker()} style={[styles.iconView,styles.borderStyle]}>
+                    <Icon name={iconName} type={"MaterialCommunityIcons"} style={styles.iconStyle}/>
+                </TouchableOpacity>
+            </View>
         </View>
     )
 }
