@@ -1,10 +1,15 @@
-import React , {useState} from 'react';
+import React , {useState,useEffect} from 'react';
 import {View,StyleSheet,TouchableOpacity,Image} from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 import { GRAY_BACKGROUND, PURPLE_BACKGROUND, WHITE_COLOR } from '../../utils/localStorage/colors/Colors';
 import { getImage } from '../../utils/images/Images';
 import {Icon} from 'native-base';
 import ErrorDisplay from '../errorDisplay/ErrorDisplay';
+import rootStores from '../../stores/Index';
+import { ERROR_STORE } from '../../stores/Stores';
+import AuthModule from '../../modules/AutModule';
+
+const errorStore = rootStores[ERROR_STORE];
 
 const defaultImage = getImage('defaultProfile');
 const PROFILE_IMAGE_WIDTH = 131;
@@ -19,39 +24,59 @@ const options = {
   };
   
 
-const ProfileImage = ({}) => {
+const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage}) => {
 
-   const [profileImage,setProfileImage] = useState(defaultImage);
-   const [iconName,setIconName] = useState('plus');
-   const [displayError,setDisplayError] = useState(false);
-   const [errorMessage,setErrorMessage] = useState('');
+//    const [profileImage,setProfileImage] = useState(defaultImage);
+//    const [iconName,setIconName] = useState('plus');
+
+//    useEffect(() => {
+//         async function getImageFromLocalStorge(){
+//             let response = await AuthModule.getImage();
+//             if(response){
+//                 setProfileImage(response);
+//                 setIconName('pencil');
+//             }
+//         }
+//         getImageFromLocalStorge()
+//      },[profileImage]);
+
 
    const showImagePicker = () => {
-        ImagePicker.showImagePicker(options, (response) => {
-            console.log('Response = ', response);
-            let errorMessageDisplay = '';
-            if (response.didCancel) {
-              errorMessageDisplay = 'עליך לבחור תמונה על מנת להתקדם לשלב הבא';
-              setErrorMessage(errorMessageDisplay);
-              setDisplayError(true);
-            } else if (response.error) {
+       const didntSelectProfileImage = !profileImageExist;
+       displayErrorMessage(false);
+
+       ImagePicker.showImagePicker(options, (response) => {
+        let errorMessageDisplay = '';
+            if(didntSelectProfileImage && response.didCancel) {
+                errorMessageDisplay = 'עליך לבחור תמונה על מנת להתקדם לשלב הבא';
+                displayErrorMessage(true,errorMessageDisplay);
+            }
+            else if (response.didCancel) {} 
+            else if (response.error) {
               console.log('ImagePicker Error: ', response.error);
-              errorMessageDisplay = 'שגיאה בעת העלאת התמונה'
-              setErrorMessage(errorMessageDisplay);
-              setDisplayError(true);
+              errorMessageDisplay = 'שגיאה בעת העלאת התמונה';
+              displayErrorMessage(true,errorMessageDisplay);
             } else {
               const source = { uri: response.uri };
-              setProfileImage(source);
-              setIconName('pencil');
-              setDisplayError(false);
+              saveImage(source);
             }
           });
     }
 
+    const displayErrorMessage = (displayError,errorMessage) => {
+        if(displayError) {
+            errorStore.setErrorMessage(errorMessage);
+            errorStore.setDisplayError(true);
+        }else{            
+            errorStore.setDisplayError(false);
+        }
+    }
+
+    const styleByImage = !profileImageExist ? styles.defaultImage : styles.avatar; 
     return(
         <View>
             <View style={[styles.profileImageView,styles.borderStyle,styles.shadow]}>
-                <Image source={profileImage} style={styles.avatar} />
+                <Image source={profileImage} style={[styles.avatar,styleByImage]} />
 
                 <TouchableOpacity onPress={() => showImagePicker()} style={[styles.iconView,styles.borderStyle]}>
                     <Icon name={iconName} type={"MaterialCommunityIcons"} style={styles.iconStyle}/>
@@ -75,10 +100,14 @@ const styles = StyleSheet.create ({
         marginVertical:10
     },
     avatar:{
-        //resizeMode:'contain',
         width:PROFILE_IMAGE_WIDTH,
         borderRadius:PROFILE_IMAGE_WIDTH/2,
         height:PROFILE_IMAGE_HEIGHT,
+    },
+    defaultImage:{
+        width:100,
+        height:100,
+        resizeMode:'contain'
     },
     borderStyle:{
         borderWidth:4,
