@@ -11,6 +11,7 @@ import AuthModule from '../../modules/AutModule';
 import { getImage } from '../../utils/images/Images';
 import CustomButton from '../../component/customButton/CustomButton';
 import SCENCE_KEYS from '../scenesManager/SceneConsts';
+import { GradientHeader } from '../../component/customHeader/CustomHeader';
 
 const errorStore = rootStores[ERROR_STORE];
 const YOUR_NAME_PLACEHOLDER = 'איך קוראים לך?';
@@ -27,33 +28,31 @@ const Profile = observer (({navigation}) => {
     const [iconName,setIconName] = useState('plus');
 
     useEffect(() => {
-         async function getImageFromLocalStorge(){
-             let image_response = await AuthModule.getImage();
-             if(image_response){
-                 setProfileImage(image_response);
-                 setImageProfileExist(true)
-                 setIconName('pencil');
-             }
-         }
+         AuthModule.getWorkerInfoFromLocalStorage()
+            .then(res => {
+                if(res && res.length > 0) {
+                    // after creating user - 3 paramters will return. 
+                    const username = res[0];
+                    const userId = res[1]; // not in used
+                    const profileImage = JSON.parse(res[2]);
 
-         async function getUserIDFromLocalStorage(){
-            let userID_response = await AuthModule.getUserID();
-            if(userID_response) {
-                setUserExist(true);
-            }
-         }
+                    //profile image
+                    setProfileImage(profileImage);
+                    setImageProfileExist(true);
+                    setIconName('pencil');   
 
-         async function getUsernameFromLocalStorage(){
-             let username_response = await AuthModule.getUsername();
-             if(username_response){
-                onUsernameChange(username_response);
-             }
-         }
-         
-         getImageFromLocalStorge();
-         getUserIDFromLocalStorage();
-         getUsernameFromLocalStorage();
-    },[profileImage,username]);
+                    //user exist
+                    setUserExist(true);
+
+                    //set username
+                    onUsernameChange(username);
+                } 
+            })
+            .catch(err =>{
+                console.log("error with worker info ",err);
+            })
+
+    },[]);
  
     function displayError (){
         const displayError = errorStore.getDisplayError;
@@ -98,17 +97,20 @@ const Profile = observer (({navigation}) => {
     const buttonText = userExist ? update_button_text : create_button_text;
     const placeholder = userExist ? username : YOUR_NAME_PLACEHOLDER;
     return(
-        <View style={styles.profileView}>
-            <View style={[styles.profilePosition]}>
-                <ProfileImage saveImage={saveImage} iconName={iconName} profileImage={profileImage} profileImageExist={profileImageExist}/>
+        <View style={[styles.view]}>
+            <GradientHeader navigation={navigation} scenceName={SCENCE_KEYS.PROFILE}/>
+            <View style={styles.profileView}>
+                <View style={[styles.profilePosition]}>
+                    <ProfileImage saveImage={saveImage} iconName={iconName} profileImage={profileImage} profileImageExist={profileImageExist}/>
+                </View>
+                <View style={{marginVertical:'40%'}}>
+                    <CustomTextInput placeholder={placeholder} onChangeText={text => onUsernameChange(text)}/>
+                </View>
+                <View style={[styles.buttonPosition]}>
+                    <CustomButton onPress={onCustomButtonPressed} disabled={!validForm()} buttonText={buttonText}/>
+                </View>
+                {displayError()}
             </View>
-            <View style={{marginVertical:'40%'}}>
-                <CustomTextInput placeholder={placeholder} onChangeText={text => onUsernameChange(text)}/>
-            </View>
-            <View style={[styles.buttonPosition]}>
-                <CustomButton onPress={onCustomButtonPressed} disabled={!validForm()} buttonText={buttonText}/>
-            </View>
-            {displayError()}
         </View>
       )
 })
@@ -117,15 +119,18 @@ export default Profile;
 
 
 const styles = StyleSheet.create({
-    profileView:{
+    view:{
         height:'100%',
         width:'100%',
-        alignItems:'center',
         backgroundColor:WHITE_COLOR
+    },
+    profileView:{
+        height:'80%',
+        alignItems:'center',
     },
     buttonPosition:{
         position:'absolute',
-        bottom:'5%'
+        bottom:'5%',
     },
     profilePosition:{
         position:'absolute',

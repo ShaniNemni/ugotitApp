@@ -26,21 +26,6 @@ const options = {
 
 const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage}) => {
 
-//    const [profileImage,setProfileImage] = useState(defaultImage);
-//    const [iconName,setIconName] = useState('plus');
-
-//    useEffect(() => {
-//         async function getImageFromLocalStorge(){
-//             let response = await AuthModule.getImage();
-//             if(response){
-//                 setProfileImage(response);
-//                 setIconName('pencil');
-//             }
-//         }
-//         getImageFromLocalStorge()
-//      },[profileImage]);
-
-
    const showImagePicker = () => {
        const didntSelectProfileImage = !profileImageExist;
        displayErrorMessage(false);
