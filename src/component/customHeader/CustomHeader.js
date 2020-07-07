@@ -4,18 +4,18 @@ import {View,Text,StyleSheet} from 'react-native';
 import { WHITE_COLOR } from '../../utils/localStorage/colors/Colors';
 import SCENCE_KEYS from '../../scenes/scenesManager/SceneConsts';
 
-export const GradientHeader = (scenceName,navgiation )=>  {
+export const GradientHeader = ({scenceName,navgiation})=>  {
     const displayText = scenceName === SCENCE_KEYS.SERVICES;
     const title = 'שירותים';
     return(
       <View style={styles.container}>
-      <LinearGradient
-        colors={["#8B37FF","#EE00C8"]}
-        start={{ x: 0, y: 1 }}end={{ x: 1, y: 1 }}
-        style={styles.linearGradient}
-      >
-       {displayText &&  <Text style={styles.textHeader}>{title}</Text> }
-      </LinearGradient>
+        <LinearGradient
+          colors={["#8B37FF","#EE00C8"]}
+          start={{ x: 0, y: 1 }}end={{ x: 1, y: 1 }}
+          style={styles.linearGradient}
+        >
+        {displayText &&  <Text style={styles.textHeader}>{title}</Text> }
+        </LinearGradient>
     </View>
     )
 }
