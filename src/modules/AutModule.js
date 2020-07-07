@@ -30,12 +30,18 @@ class AuthModule {
             .then(res => {
                 if(res && res.status === 200){
                     const userID = res.data.id;
-                    this.saveImage(body.picture);
-                    this.saveUsername(body.name);
-                    this.saveUserId(userID);
+                    const username = body.name;
+                    const imageProfile = body.picture;
+                    return this.saveAllWorkerInfo(userID,username,imageProfile)
+                        .then(res=> {
+                            return res;
+                        })
+                        .catch(err => {
+                            throw err;
+                        })
                 }
 
-                return res && res.status === 200;
+                return false;
             })
             .catch(err => {
                 console.log("error with create worker ",err);
@@ -43,78 +49,85 @@ class AuthModule {
             })
     }
 
-    saveUsername = async (username) => {
-        const usernameKey = LOCAL_STORAGE_KEYS.USERNAME;
-        return this.saveToLocalStorage(usernameKey,username)
-            .catch(err => {
-                console.log("error with save username ",err);
-            })
-    }
-
-    saveUserId = async (userId) => {
-        const userIdKey = LOCAL_STORAGE_KEYS.USER_ID;
-        return this.saveToLocalStorage(userIdKey,userId)
-            .catch(err => {
-                console.log("error with save userID ",err);
-            })
-    }
-
-    saveImage = async (imagePath) => {
+    saveAllWorkerInfo = (userId,username,imagePath) => {
+        const userNameKey = LOCAL_STORAGE_KEYS.USERNAME;
+        const userIDKey = LOCAL_STORAGE_KEYS.USER_ID;
         const imageKey = LOCAL_STORAGE_KEYS.PROFILE_IMAGE;
-        const convertImagePath = JSON.stringify(imagePath);
-        return this.saveToLocalStorage(imageKey,convertImagePath)
+
+        const imagePathConvert= JSON.stringify(imagePath);
+
+        const userNamePromise = LocalStorage.setItem(userNameKey,username); 
+        const userIdPromise = LocalStorage.setItem(userIDKey,userId); 
+        const imagePromise = LocalStorage.setItem(imageKey,imagePathConvert); 
+
+        return Promise.all([userNamePromise,userIdPromise,imagePromise])
+            .then(res => {
+                if(res && res.length === 3){
+                    return true;
+                }
+
+                return false;
+            })
             .catch(err => {
-                console.log("error with save image ",err);
+                console.log("error with save all worker info ",err);
+                throw err;
+            })
+
+    }
+
+    getWorkerInfoFromLocalStorage = () => {
+        const userNameKey = LOCAL_STORAGE_KEYS.USERNAME;
+        const userIDKey = LOCAL_STORAGE_KEYS.USER_ID;
+        const imageKey = LOCAL_STORAGE_KEYS.PROFILE_IMAGE;
+        const defaultValue = undefined;
+
+        const userNamePromise = LocalStorage.getItem(userNameKey,defaultValue); 
+        const userIdPromise = LocalStorage.getItem(userIDKey,defaultValue); 
+        const imagePromise = LocalStorage.getItem(imageKey,defaultValue); 
+
+        return Promise.all([userNamePromise,userIdPromise,imagePromise])
+            .then(results => {
+                return results;
+            })
+            .catch(err => {
+                console.log("error with get worker info ",err);
+                throw err;
             })
     }
 
-    saveToLocalStorage = (key,value) => {
-        return LocalStorage.setItem(key,value)
-            .catch(err => {
-                console.log("error with saveToLocalStorage ",err);
+    removeWorkerDataFromLocalStorage = () => {
+        const userNameKey = LOCAL_STORAGE_KEYS.USERNAME;
+        const userIDKey = LOCAL_STORAGE_KEYS.USER_ID;
+        const imageKey = LOCAL_STORAGE_KEYS.PROFILE_IMAGE;
+
+        const usernamePromise = LocalStorage.removeItem(userNameKey);
+        const useridPromise = LocalStorage.removeItem(userIDKey);
+        const imagePromise = LocalStorage.removeItem(imageKey);
+
+        return Promise.all([usernamePromise,useridPromise,imagePromise])
+            .then(res => {
+                if(res && res[0] && res[1] && res[2]){
+                    return true;
+                }
+                return false;
             })
+            .catch(err => {
+                console.log("error with remove all worker info ",err);
+                throw err;
+            })
+
+
     }
 
-    getFromLocalStorage = async (key,deafultValue) => {
-        return LocalStorage.getItem(key,deafultValue)
+    getUserID = () => {
+        const userIDKey = LOCAL_STORAGE_KEYS.USER_ID;
+        const deafultValue = undefined;
+        return LocalStorage.getItem(userIDKey,deafultValue)
             .then(value => {
                 return value;
             })
             .catch(err => {
-                console.log("error with getFromLocalStorage ",err);
-            })
-    }
-
-    getUsername = async () => {
-        const userNameKey = LOCAL_STORAGE_KEYS.USERNAME;
-        const deafultValue = undefined;
-        return this.getFromLocalStorage(userNameKey,deafultValue)
-            .catch(err => {
-                console.log("error with getUsername ",err);
-            })
-    }
-
-
-    getUserID = async () => {
-        const userIDKey = LOCAL_STORAGE_KEYS.USER_ID;
-        const deafultValue = undefined;
-        return this.getFromLocalStorage(userIDKey,deafultValue)
-            .catch(err => {
                 console.log("error with getUserID ",err);
-            })
-    }
-
-    
-    getImage = async () => {
-        const imageKey = LOCAL_STORAGE_KEYS.PROFILE_IMAGE;
-        const deafultValue = undefined;
-        return this.getFromLocalStorage(imageKey,deafultValue)
-            .then(imagePath => {
-                imagePathParse = JSON.parse(imagePath)
-                return imagePathParse;
-            })
-            .catch(err => {
-                console.log("error with getImage ",err);
             })
     }
 }
