@@ -67,14 +67,8 @@ const Profile = observer (({navigation}) => {
     }
 
     function saveImage (source){
-        return AuthModule.saveImage(source)
-            .then(() => {
-                setIconName('pencil');
-                setProfileImage(source);
-            })
-            .catch(err => {
-                console.log("error with save image in Localstorage ",err);
-            })
+         setIconName('pencil');
+         setProfileImage(source);
     }
 
     function validForm(){
@@ -134,7 +128,7 @@ const styles = StyleSheet.create({
     },
     profilePosition:{
         position:'absolute',
-        top:-50,
+        top:-80,
         zIndex:20
     },
     errorDisplayPosition:{
