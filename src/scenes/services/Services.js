@@ -1,5 +1,5 @@
 import React,{Component,useState} from 'react';
-import {View,Text,StyleSheet,TouchableOpacity,TouchableHighlight,Animated} from 'react-native';
+import {View,Text,StyleSheet,TouchableOpacity,TouchableHighlight,Animated,Platform} from 'react-native';
 import { GradientHeader } from '../../component/customHeader/CustomHeader';
 import SCENCE_KEYS from '../scenesManager/SceneConsts';
 import CustomButton from '../../component/customButton/CustomButton';
@@ -34,22 +34,25 @@ const Services = ({}) => {
           setHidden(!isHidden);
     }
    
-
+    const iosPlatform = Platform.OS === 'ios';
+    const iconNameByPlatform = iosPlatform ? "plus-circle-outline" : "pluscircle";
+    const iconTypeByPlatform = iosPlatform ? "MaterialCommunityIcons" : "AntDesign";
+    const styleByPlatform = iosPlatform ? styles.iosButtonView : styles.androidButtonView;
     return(
         <View style={[styles.view]}>
             <GradientHeader scenceName={SCENCE_KEYS.SERVICES}/>
             <View style={[styles.serviceView]}>
 
-                <TouchableOpacity onPress={() => toggleCreateService()} style={[styles.addServiceButton]}>
-                    <Text style={[styles.textStyle]}>{addServiceButton}</Text>
+                <TouchableOpacity onPress={() => toggleCreateService()} style={[styles.addServiceButton,styleByPlatform]}>
                     <View style={[styles.iconView]}>
-                        <Icon name={"plus-circle-outline"} type={"MaterialCommunityIcons"} style={[styles.iconStyle]}/>
+                        <Icon name={iconNameByPlatform} type={iconTypeByPlatform} style={[styles.iconStyle]}/>
                     </View>
+                    <Text style={[styles.textStyle]}>{addServiceButton}</Text>
                 </TouchableOpacity>   
                 
               { !isHidden &&
                     <Animated.View style={[styles.subView,{transform: [{translateY: bounceValue}]}]}>
-                        <CreateService closeSubview = {toggleCreateService}/>
+                        <CreateService iosPlatform={iosPlatform} closeSubview = {toggleCreateService}/>
                     </Animated.View> }
 
 
@@ -73,16 +76,23 @@ const styles = StyleSheet.create({
         alignItems:'center'
     },  
     addServiceButton:{
-        alignSelf:'flex-start',
         flexDirection:'row',
         width:130,
         position:'absolute',
-        bottom:'20%',
-        left:'10%',
+        bottom:'30%',
         alignItems:'center'
     },
+    iosButtonView:{
+        alignSelf:'flex-start',
+        left:'10%',
+    },
+    androidButtonView:{
+        alignSelf:'flex-end',
+        right:'5%',
+    },
     iconView:{
-        width:30
+        width:30,
+        marginHorizontal:5
     }, 
     iconStyle:{
         color:PURPLE_BACKGROUND,
@@ -90,13 +100,13 @@ const styles = StyleSheet.create({
         fontFamily:'bold'
     } ,
     textStyle:{
-        width:80,
+        width:100,
         fontSize:15,
         color:PURPLE_BACKGROUND
     },
     buttonPosition:{
         position:'absolute',
-        bottom:'5%',
+        bottom:'15%',
     },
     subView: {
         position: "absolute",
@@ -104,7 +114,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         backgroundColor: "#FFFFFF",
-        height: '80%',
+        height: '90%',
       }
     
 })
