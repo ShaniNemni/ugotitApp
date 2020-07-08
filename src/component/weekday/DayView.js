@@ -3,29 +3,24 @@ import {View,Text,TouchableOpacity,StyleSheet,ScrollView} from 'react-native';
 import { GRAY_BACKGROUND, PURPLE_BACKGROUND } from '../../utils/localStorage/colors/Colors';
 
 const DayView = ({day,onSelectedDays}) => {
-    // console.log("DAY recived ---- ",day);
-    // const [dayDisplay,setDaySelection] = useState(day);
+    
+    const [daySelected,setDaySelected] = useState(day.selected);
 
-    // useEffect(() => {
-        
-    // }, [input])
-    // const onSelectedDay = () => {
-    //     const checkDaySelected = dayDisplay.selected;
-    //     dayDisplay.selected = !checkDaySelected;
-    //     console.log("day ",dayDisplay);
-    //     setDaySelection(dayDisplay);
-    //     onSelectedDays(dayDisplay);
-    // }
+    function getSelectionStyle (){
+        return daySelected ? styles.selectedCircle : styles.unselectedCircle;
+    }
 
-    // const getSelectionStyle = () => {
-    //     console.log("getSelectionStyle ",dayDisplay.selected);
-    //     return dayDisplay.selected ? styles.selectedCircle : styles.unselectedCircle;
-    // }
+    function onSelectedDay () {
+        const daySelectedValue = !daySelected;
+        const dayId = day.id;
+        setDaySelected(daySelectedValue);
+        onSelectedDays(daySelectedValue,dayId)
+    }
 
     return(
         <View style={styles.view}>
             <Text>{day.name}</Text>
-            {/* <TouchableOpacity onPress={() => onSelectedDay(dayDisplay)} style={[styles.selectionCircle,getSelectionStyle()]}/> */}
+            <TouchableOpacity onPress={() => onSelectedDay()} style={[styles.selectionCircle,getSelectionStyle()]}/>
         </View>
     )
 }

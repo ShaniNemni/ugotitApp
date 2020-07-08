@@ -1,36 +1,43 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import {ScrollView,StyleSheet,View} from 'react-native';
 import DayView from './DayView';
+import rootStores from '../../stores/Index';
+import { SERVICE_STORE } from '../../stores/Stores';
 
 
-const daysList = [{id:6,name:'שישי',selected:false},{id:5,name:'חמישי',selected:false},{id:4,name:'רביעי',selected:false},{id:3,name:'שלישי',selected:false},{id:2,name:'שני',selected:false},{id:1,name:'ראשון',selected:false}]
+let daysList = [{id:1,name:'ראשון',selected:false},{id:2,name:'שני',selected:false},{id:3,name:'שלישי',selected:false},{id:4,name:'רביעי',selected:false},{id:5,name:'חמישי',selected:false},{id:6,name:'שישי',selected:false}]
+const serviceStore = rootStores[SERVICE_STORE];
 
 const WeekView = () => {
 
-    const [days,setSelectedDays] = useState(daysList);
+    const [days,setDays] = useState(daysList);
 
-    // const onSelectedDay = (selectedDay) => {
-    //     const dayIndex = days.findIndex(dayElement => dayElement.id === selectedDay.id);
-    //     const checkDaySelected = days[dayIndex].selected;
-    //     days[dayIndex].selected = !checkDaySelected;
-    //     console.log("DAYS ----- ",days);
-    //     setSelectedDays(days);
-    // }
+    const onSelectedDays = (daySelectedValue,dayId) => {
+        const dayIndex = days.findIndex(dayElment => dayElment.id === dayId);
+        days[dayIndex].selected = daySelectedValue;
+        setDays(days);
+        setSelectedDays();
+    }
 
-    const onSelectedDays = (selectedDay) => {
-        const dayIndex = days.findIndex(dayElement => dayElement.id === selectedDay.id);
-        days[dayIndex] = selectedDay;
-        setSelectedDays(days);
-        console.log("DAYS ----- ",days);
+    const setSelectedDays = () => {
+        let idsDays = [];
+        
+        days.map(dayElemnt => {
+            if(dayElemnt.selected === true){
+                idsDays.push(dayElemnt.id);
+            }
+        });
+
+        serviceStore.setSelectedDays(idsDays);
     }
 
     const renderWeek = () => {
-        const dayToDisplay = days.map(dayElement => (
+        const dayToDisplay = daysList.map(dayElement => (
             <DayView onSelectedDays={onSelectedDays} key={dayElement.id} day={dayElement}/>
         ))
 
         return(
-            <ScrollView horizontal={true} style={{marginHorizontal:10}}>
+            <ScrollView horizontal={true} style={{marginHorizontal:10,flexDirection:'row'}}>
                     {dayToDisplay}
             </ScrollView>
         )
