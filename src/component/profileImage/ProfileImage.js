@@ -22,12 +22,38 @@ const options = {
       path: 'images',
     },
   };
+
+  const imageTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/bmp',
+    'image/gif',
+    'image/svg+xml',
+    'image/x-icon'
+];
+
   
 
 const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage,iconType}) => {
 
+    useEffect(() => {
+        //console.log("USE EFFECT !")
+    }, [profileImageExist])
+
+    const imageValidation = (type) => {
+        if(imageTypes.includes(type)){
+            return true;
+        }
+
+        const errorMessage = 'עליך לבחור תמונה בלבד'
+        errorStore.setErrorMessage(errorMessage);
+        errorStore.setDisplayError(true);
+        return false;
+    }
+
    const showImagePicker = () => {
        const didntSelectProfileImage = !profileImageExist;
+       console.log("didntSelectProfileImage ",didntSelectProfileImage);
        displayErrorMessage(false);
 
        ImagePicker.showImagePicker(options, (response) => {
@@ -38,10 +64,9 @@ const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage,iconTyp
             }
             else if (response.didCancel) {} 
             else if (response.error) {
-              console.log('ImagePicker Error: ', response.error);
               errorMessageDisplay = 'שגיאה בעת העלאת התמונה';
               displayErrorMessage(true,errorMessageDisplay);
-            } else {
+            } else if(imageValidation(response.type)){
               const source = { uri: response.uri };
               saveImage(source);
             }
@@ -57,11 +82,11 @@ const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage,iconTyp
         }
     }
 
-    const styleByImage = !profileImageExist ? styles.defaultImage : styles.defaultImage; 
+    const styleByImage = !profileImageExist ? styles.defaultImage : styles.avatar; 
     return(
         <View>
             <View style={[styles.profileImageView,styles.borderStyle,styles.shadow]}>
-                <Image source={profileImage} style={[styles.avatar,styleByImage]} />
+                <Image resizeMode={"cover"} source={profileImage} style={[styles.avatar,styleByImage]} />
 
                 <TouchableOpacity onPress={() => showImagePicker()} style={[styles.iconView,styles.borderStyle]}>
                     <Icon name={iconName} type={iconType} style={styles.iconStyle}/>
