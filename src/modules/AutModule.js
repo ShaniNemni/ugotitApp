@@ -99,14 +99,16 @@ class AuthModule {
         const userNameKey = LOCAL_STORAGE_KEYS.USERNAME;
         const userIDKey = LOCAL_STORAGE_KEYS.USER_ID;
         const imageKey = LOCAL_STORAGE_KEYS.PROFILE_IMAGE;
+        const services_ids = LOCAL_STORAGE_KEYS.SERVICES_IDS;
 
         const usernamePromise = LocalStorage.removeItem(userNameKey);
         const useridPromise = LocalStorage.removeItem(userIDKey);
         const imagePromise = LocalStorage.removeItem(imageKey);
-
-        return Promise.all([usernamePromise,useridPromise,imagePromise])
+        const servicesIdsPromise = LocalStorage.removeItem(services_ids);
+        
+        return Promise.all([usernamePromise,useridPromise,imagePromise,servicesIdsPromise])
             .then(res => {
-                if(res && res[0] && res[1] && res[2]){
+                if(res && res[0] && res[1] && res[2] && res[3]){
                     return true;
                 }
                 return false;

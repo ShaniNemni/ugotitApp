@@ -1,4 +1,4 @@
-import React,{Component,useState} from 'react';
+import React,{Component,useState,useEffect} from 'react';
 import {View,Text,StyleSheet,TouchableOpacity,TouchableHighlight,Animated,Platform} from 'react-native';
 import { GradientHeader } from '../../component/customHeader/CustomHeader';
 import SCENCE_KEYS from '../scenesManager/SceneConsts';
@@ -6,13 +6,24 @@ import CustomButton from '../../component/customButton/CustomButton';
 import {Icon} from 'native-base';
 import { PURPLE_BACKGROUND } from '../../utils/localStorage/colors/Colors';
 import CreateService from './CreateService';
+import { observer } from 'mobx-react';
+import rootStores from '../../stores/Index';
+import { SERVICE_STORE } from '../../stores/Stores';
 
 const buttonText =  'סיום';
 const addServiceButton = 'הוספת שירות';
+const serviceStore = rootStores[SERVICE_STORE];
 
 const Services = ({}) => {
     const [bounceValue,setBounceValue] = useState(new Animated.Value(100));
-    const [isHidden , setHidden] = useState(true);
+    const [isHidden , setHidden] = useState(true);    
+    const [services, setServices] = useState([]);
+
+    useEffect(() => {
+        const servicesObjects = serviceStore.getServices;
+        console.log("servicesObjects ",servicesObjects);
+        setServices(servicesObjects);
+    }, [])
 
     function toggleCreateService(){
         let toValue = 100;
@@ -114,7 +125,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         backgroundColor: "#FFFFFF",
-        height: '90%',
+        height: '95%',
       }
     
 })
