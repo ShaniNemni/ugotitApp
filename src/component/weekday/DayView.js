@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
         width:80,
         alignItems:'center',
         flexDirection:'column',
-        borderWidth:1,
     },
     selectionCircle:{
         height:30,
