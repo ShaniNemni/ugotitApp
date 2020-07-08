@@ -1,5 +1,4 @@
 import { observable, action,computed} from "mobx";
-import { act } from "react-test-renderer";
 
 export default class ErrorStore {
     @observable
