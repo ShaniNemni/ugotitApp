@@ -32,20 +32,26 @@ const Profile = observer (({navigation}) => {
             .then(res => {
                 if(res && res.length > 0) {
                     // after creating user - 3 paramters will return. 
-                    const username = res[0];
-                    const userId = res[1]; // not in used
-                    const profileImage = JSON.parse(res[2]);
+                    const username = res[0] ? res[0] : undefined;
+                    const userId = res[1] ? res[1] : undefined; 
+                    const profileImage = res[2] ? JSON.parse(res[2]) : undefined;
 
                     //profile image
-                    setProfileImage(profileImage);
-                    setImageProfileExist(true);
-                    setIconName('pencil');   
+                    if(profileImage) {
+                        setProfileImage(profileImage);
+                        setImageProfileExist(true);
+                        setIconName('pencil');   
+                    }
 
                     //user exist
-                    setUserExist(true);
+                    if(userId) {
+                        setUserExist(true);
+                    }
 
                     //set username
-                    onUsernameChange(username);
+                    if(username) {
+                        onUsernameChange(username);
+                    }
                 } 
             })
             .catch(err =>{
@@ -69,6 +75,7 @@ const Profile = observer (({navigation}) => {
     function saveImage (source){
          setIconName('pencil');
          setProfileImage(source);
+         setImageProfileExist(true);
     }
 
     function validForm(){
