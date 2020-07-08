@@ -1,5 +1,5 @@
 import React,{Component,useState,useEffect} from 'react';
-import {View,Text,TouchableOpacity,StyleSheet} from 'react-native';
+import {View,Text,TouchableOpacity,StyleSheet,Platform} from 'react-native';
 import ProfileImage from '../../component/profileImage/ProfileImage';
 import ErrorDisplay from '../../component/errorDisplay/ErrorDisplay';
 import { observer,inject } from 'mobx-react';
@@ -90,12 +90,13 @@ const Profile = observer (({navigation}) => {
     
     const buttonText = userExist ? update_button_text : create_button_text;
     const placeholder = userExist ? username : YOUR_NAME_PLACEHOLDER;
+    const iconTypeByPlatform = Platform.OS === 'ios' ? "MaterialCommunityIcons" :  "Octicons";
     return(
         <View style={[styles.view]}>
             <GradientHeader navigation={navigation} scenceName={SCENCE_KEYS.PROFILE}/>
             <View style={styles.profileView}>
                 <View style={[styles.profilePosition]}>
-                    <ProfileImage saveImage={saveImage} iconName={iconName} profileImage={profileImage} profileImageExist={profileImageExist}/>
+                    <ProfileImage saveImage={saveImage} iconType={iconTypeByPlatform} iconName={iconName} profileImage={profileImage} profileImageExist={profileImageExist}/>
                 </View>
                 <View style={{marginVertical:'40%'}}>
                     <CustomTextInput placeholder={placeholder} onChangeText={text => onUsernameChange(text)}/>
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     },
     buttonPosition:{
         position:'absolute',
-        bottom:'5%',
+        bottom:'15%',
     },
     profilePosition:{
         position:'absolute',
@@ -133,6 +134,6 @@ const styles = StyleSheet.create({
     },
     errorDisplayPosition:{
         position:'absolute',
-        bottom:'15%'
+        bottom:'28%',
     }
 })

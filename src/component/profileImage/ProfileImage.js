@@ -24,7 +24,7 @@ const options = {
   };
   
 
-const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage}) => {
+const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage,iconType}) => {
 
    const showImagePicker = () => {
        const didntSelectProfileImage = !profileImageExist;
@@ -33,7 +33,7 @@ const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage}) => {
        ImagePicker.showImagePicker(options, (response) => {
         let errorMessageDisplay = '';
             if(didntSelectProfileImage && response.didCancel) {
-                errorMessageDisplay = 'עליך לבחור תמונה על מנת להתקדם לשלב הבא';
+                errorMessageDisplay = 'עליך לבחור תמונה על מנת להתקדם';
                 displayErrorMessage(true,errorMessageDisplay);
             }
             else if (response.didCancel) {} 
@@ -57,14 +57,14 @@ const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage}) => {
         }
     }
 
-    const styleByImage = !profileImageExist ? styles.defaultImage : styles.avatar; 
+    const styleByImage = !profileImageExist ? styles.defaultImage : styles.defaultImage; 
     return(
         <View>
             <View style={[styles.profileImageView,styles.borderStyle,styles.shadow]}>
                 <Image source={profileImage} style={[styles.avatar,styleByImage]} />
 
                 <TouchableOpacity onPress={() => showImagePicker()} style={[styles.iconView,styles.borderStyle]}>
-                    <Icon name={iconName} type={"MaterialCommunityIcons"} style={styles.iconStyle}/>
+                    <Icon name={iconName} type={iconType} style={styles.iconStyle}/>
                 </TouchableOpacity>
             </View>
         </View>

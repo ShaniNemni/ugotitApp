@@ -3,7 +3,7 @@ import {TouchableOpacity,Text,StyleSheet} from 'react-native';
 import { PURPLE_BACKGROUND, WHITE_COLOR, GRAY_BACKGROUND } from '../../utils/localStorage/colors/Colors';
 
 const INPUT_TEXT_WIDTH = 343;
-const INPUT_TEXT_HEIGHT = 60;
+const INPUT_TEXT_HEIGHT = 50;
 
 const CustomButton = (props) => {
     //disabled //fo
