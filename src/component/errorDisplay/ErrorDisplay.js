@@ -1,13 +1,15 @@
 import React from 'react';
-import {View,Text,StyleSheet} from 'react-native';
+import {View,Text,StyleSheet,Platform} from 'react-native';
 import {Icon}  from 'native-base';
 import { ERROR_BACKGROUND } from '../../utils/localStorage/colors/Colors';
 
 
 const ErrorDisplay = ({errorText}) => {
+    const viewStyletByPlatform = Platform.OS === 'ios' ? styles.viewIOS : styles.viewANDROID;
+    const textStyleByPlatform = Platform.OS === 'ios' ? undefined : styles.errorTextAndroid;
     return(
-        <View style={[styles.errorView,styles.errorIconAndText]}>
-            <Text style={styles.errorText} numberOfLines={1}>{errorText}</Text>  
+        <View style={[styles.errorView,styles.errorIconAndText,viewStyletByPlatform]}>
+            <Text style={[styles.errorText,textStyleByPlatform]} numberOfLines={1}>{errorText}</Text>  
             <View style={[styles.iconView]}>
                 <Icon name={"error"} type={"MaterialIcons"} style={styles.iconView}/>
             </View> 
@@ -24,8 +26,13 @@ const styles = StyleSheet.create({
         borderRadius:180,
         alignContent:'center',
         backgroundColor:ERROR_BACKGROUND,
-        justifyContent:'flex-end',
         alignSelf:'center',
+    },
+    viewIOS:{
+        justifyContent:'flex-end',
+    },
+    viewANDROID:{
+        justifyContent:'flex-start',
     },
     errorIconAndText:{
         flexDirection:'row',
@@ -34,6 +41,10 @@ const styles = StyleSheet.create({
     errorText:{
         maxWidth:300,
         fontSize:16,
+    },
+    errorTextAndroid:{
+        textAlign:'right',
+        marginHorizontal:8
     },
     iconView:{
         width:30,
