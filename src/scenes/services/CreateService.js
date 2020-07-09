@@ -25,7 +25,7 @@ const CreateService = observer (({closeSubview,iosPlatform}) => {
 
     function changeTextInput() {
         const serviceName = serviceStore.getServiceName;
-        return serviceName.length > 0;
+        return serviceName && serviceName.length > 0;
     }
 
     function validTime() {
