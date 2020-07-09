@@ -22,20 +22,25 @@ export default class ServiceStore {
     @observable
     services = observable([]);
 
+    @observable
+    loadingService = false;
 
-    constructor(){
+
+    constructor(){}
+
+    initServices = () => {
         return this.getUserId()
-            .then(userID => {
-                console.log("userID constatcor ",userID);
-                this.setUserid(userID);
-                //this.initServices();
+            .then(userId => {
+                console.log("userID constatcor ",userId);
+                this.setUserid(userId);
+                this.getServices();
             })
             .catch(err => {
-                console.log("error with getuser id",err);
+                console.log("error with get user id ",err);
             })
     }
 
-    initServices = () => {
+    getServices = () => {
         const userId = this.userID;
         return ServiceModule.getServiceIdFromLocalStorage()
         .then(servicesIdsRes => {
@@ -60,6 +65,18 @@ export default class ServiceStore {
 
     }
 
+    //// set loading ////
+    @action
+    setLoading(loadingValue){
+        console.log("setLoading loadingValue ",loadingValue);
+        this.loadingService = loadingValue;
+    }
+
+    @computed
+    get getLoading(){
+        return this.loadingService;
+    }
+
     //// set services ////
     @action
     setServices(service) {
@@ -68,7 +85,7 @@ export default class ServiceStore {
     }
 
     @computed
-    get getServices(){
+    get getAllServices(){
         return toJS(this.services);
     }
 

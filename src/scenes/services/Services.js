@@ -20,7 +20,7 @@ const Services = ({}) => {
     const [services, setServices] = useState([]);
 
     useEffect(() => {
-        const servicesObjects = serviceStore.getServices;
+        const servicesObjects = serviceStore.getAllServices;
         console.log("servicesObjects ",servicesObjects);
         setServices(servicesObjects);
     }, [])
