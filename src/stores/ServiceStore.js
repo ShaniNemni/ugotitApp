@@ -2,7 +2,6 @@ import { observable, action,computed,toJS} from "mobx";
 import LocalStorage from '../utils/localStorage/LocalStorage';
 import {LOCAL_STORAGE_KEYS} from '../utils/localStorage/LocalStorageKeys';
 import ServiceModule from '../modules/ServiceModule';
-
 export default class ServiceStore {
     @observable
     serviceName = "" ;
@@ -29,14 +28,15 @@ export default class ServiceStore {
     constructor(){}
 
     initServices = () => {
+        this.setLoading(true);
         return this.getUserId()
             .then(userId => {
-                console.log("userID constatcor ",userId);
                 this.setUserid(userId);
                 this.getServices();
             })
             .catch(err => {
                 console.log("error with get user id ",err);
+                this.setLoading(false);
             })
     }
 
@@ -44,23 +44,30 @@ export default class ServiceStore {
         const userId = this.userID;
         return ServiceModule.getServiceIdFromLocalStorage()
         .then(servicesIdsRes => {
+            let servicesObjects = [];
             if(servicesIdsRes && servicesIdsRes.length > 0){
                 servicedIdsArray = servicesIdsRes.split(",");
                 const promises = servicedIdsArray.map(serviceId => {
-                    const convertedServicedId = serviceId.replace('"',"");
+                    const convertedServicedId = serviceId.replace(/['"]+/g,"");
                     let body = {worker:userId,id:convertedServicedId};
                     return ServiceModule.getServiceById(body)
                         .then(serviceObject => {
-                            this.setServices(serviceObject);
+                            servicesObjects.push(serviceObject);
                         })
                 });
 
                 return Promise.all(promises)
+                    .then(() => {
+                        this.setServices(servicesObjects);
+                        this.setLoading(false);
+                    })
                     .catch(err => {
                         console.log("error with promise all services id ",err);
+                        this.setLoading(false);
                     })
-
             }
+            //in case no services from local storage
+            this.setLoading(false)
         })
 
     }
@@ -68,7 +75,6 @@ export default class ServiceStore {
     //// set loading ////
     @action
     setLoading(loadingValue){
-        console.log("setLoading loadingValue ",loadingValue);
         this.loadingService = loadingValue;
     }
 
@@ -77,15 +83,14 @@ export default class ServiceStore {
         return this.loadingService;
     }
 
-    //// set services ////
     @action
-    setServices(service) {
-        this.services.push(service);
-        console.log("this.services ",toJS(this.services))
+    setServices(services) {
+        this.services.replace(services)
     }
 
     @computed
     get getAllServices(){
+        console.log("getAllServices this.services ",toJS(this.services))
         return toJS(this.services);
     }
 
@@ -178,12 +183,44 @@ export default class ServiceStore {
         console.log("BODY ---- ",body);
         return ServiceModule.createOrUpdateService(body)
             .then(res => {
-                console.log("ressssss create service ",res);
+                if(res) {
+                 return this.getServices()
+                     .then(() => {
+                        return true;
+                     })
+                     .catch(err => {
+                        console.log("error with get services ",err);
+                        return false;
+                     })
+                }
+                return res;
             })
             .catch(err => {
                 console.log("error with create service ",err);
+                throw false;
             })
-        
+    }
+
+
+    deleteService(serviceId){
+        const userId = this.userID;
+        const body = {worker:userId,id:serviceId}
+
+        return ServiceModule.deleteService(body)
+            .then(res => {
+                console.log("res deleteService ",res);
+                if(res) {
+                    return this.getServices()
+                        .catch(err => {
+                            console.log(" error with getServices ",err)
+                        })
+                }
+                return res;
+            })
+            .catch(err => {
+                console.log("error with delete service ",err);
+                throw err;
+            })
     }
 
 
