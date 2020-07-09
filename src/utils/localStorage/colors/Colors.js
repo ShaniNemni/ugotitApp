@@ -5,3 +5,4 @@ export const ERROR_BACKGROUND= '#FFD6D6';
 export const LIGHT_GRAY_BACKGROUND = '#F5F5F5'
 export const BLACK = 'black';
 export const ERROR_TEXT = 'red';
+export const GRAY_TEXT = '#9D9D9D';

@@ -4,3 +4,4 @@ export const CREATE_USER = 'worker';
 export const CHECK_SERVICE_TIME_EXIST= 'overlap';
 export const CREATE_OR_UPDATE_SERVICE = 'service';
 export const GET_SERVICE = 'getService';
+export const DELETE_SERVICE = 'deleteService';
