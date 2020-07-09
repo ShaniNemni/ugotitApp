@@ -1,8 +1,8 @@
-import React,{Component,useState,useEffect} from 'react';
-import {View,Text,TouchableOpacity,StyleSheet,Platform,Image} from 'react-native';
+import React,{useState,useEffect} from 'react';
+import {View,StyleSheet,Platform,Image} from 'react-native';
 import ProfileImage from '../../component/profileImage/ProfileImage';
 import ErrorDisplay from '../../component/errorDisplay/ErrorDisplay';
-import { observer,inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import rootStores from '../../stores/Index';
 import { ERROR_STORE, SERVICE_STORE } from '../../stores/Stores';
 import CustomTextInput from '../../component/costumTextInput/CustomTextInput';
@@ -32,7 +32,7 @@ const Profile = observer (({navigation}) => {
     const [userExist,setUserExist] = useState(false);
     const [iconName,setIconName] = useState('plus');
     const [loading,setLoading] = useState(false);
-
+    
     useEffect(() => {
          AuthModule.getWorkerInfoFromLocalStorage()
             .then(res => {
@@ -108,6 +108,9 @@ const Profile = observer (({navigation}) => {
                 if(res) {
                     serviceStore.initServices()
                         .then(() => {
+                            setIconName("plus");
+                            onUsernameChange('');
+                            setProfileImage(defaultImage);
                             setLoading(false);
                             navigation.navigate(SCENCE_KEYS.SERVICES)
                         })
@@ -122,7 +125,6 @@ const Profile = observer (({navigation}) => {
     }
     
     const buttonText = userExist ? update_button_text : create_button_text;
-    const placeholder = userExist ? username : YOUR_NAME_PLACEHOLDER;
     const iconTypeByPlatform = Platform.OS === 'ios' ? "MaterialCommunityIcons" :  "Octicons";
     return(
         <View style={[styles.view]}>
@@ -132,7 +134,7 @@ const Profile = observer (({navigation}) => {
                     <ProfileImage saveImage={saveImage} setLoading={setLoading} iconType={iconTypeByPlatform} iconName={iconName} profileImage={profileImage} profileImageExist={profileImageExist}/>
                 </View>
                 <View style={{marginVertical:'40%'}}>
-                    <CustomTextInput placeholder={placeholder} onChangeText={text => onUsernameChange(text)}/>
+                    <CustomTextInput defaultValue={username} placeholder={YOUR_NAME_PLACEHOLDER} onChangeText={text => onUsernameChange(text)}/>
                 </View>
                 {renderLoading()}
                 <View style={[styles.buttonPosition]}>

@@ -9,22 +9,17 @@ import CreateService from './CreateService';
 import { observer } from 'mobx-react';
 import rootStores from '../../stores/Index';
 import { SERVICE_STORE } from '../../stores/Stores';
+import ServiceList from './ServiceList';
+import AutModule from '../../modules/AutModule';
 
 const buttonText =  'סיום';
 const addServiceButton = 'הוספת שירות';
 const serviceStore = rootStores[SERVICE_STORE];
 
-const Services = ({}) => {
+const Services = observer(({navigation}) => {
     const [bounceValue,setBounceValue] = useState(new Animated.Value(100));
     const [isHidden , setHidden] = useState(true);    
-    const [services, setServices] = useState([]);
-
-    useEffect(() => {
-        const servicesObjects = serviceStore.getAllServices;
-        console.log("servicesObjects ",servicesObjects);
-        setServices(servicesObjects);
-    }, [])
-
+    
     function toggleCreateService(){
         let toValue = 100;
         if(isHidden) {
@@ -44,6 +39,20 @@ const Services = ({}) => {
       
           setHidden(!isHidden);
     }
+
+    function validButton(){
+        const getServices = serviceStore.getAllServices;
+        return getServices.length > 0;
+    }
+
+    function onFinishPresed() {
+        return AutModule.removeWorkerDataFromLocalStorage()
+            .then(res => {
+                if(res) {
+                    navigation.navigate(SCENCE_KEYS.PROFILE);
+                }
+            })
+    }
    
     const iosPlatform = Platform.OS === 'ios';
     const iconNameByPlatform = iosPlatform ? "plus-circle-outline" : "pluscircle";
@@ -53,6 +62,9 @@ const Services = ({}) => {
         <View style={[styles.view]}>
             <GradientHeader scenceName={SCENCE_KEYS.SERVICES}/>
             <View style={[styles.serviceView]}>
+                <View style={{height:'58%',alignSelf:'flex-start',width:'100%'}}>
+                    <ServiceList/>
+                </View>
 
                 <TouchableOpacity onPress={() => toggleCreateService()} style={[styles.addServiceButton,styleByPlatform]}>
                     <View style={[styles.iconView]}>
@@ -68,12 +80,12 @@ const Services = ({}) => {
 
 
                 {isHidden && <View style={[styles.buttonPosition]}>
-                    <CustomButton buttonText={buttonText}/>
+                    <CustomButton onPress={onFinishPresed} disabled={!validButton()} buttonText={buttonText}/>
                 </View>}
             </View>
         </View>
     )
-}
+})
 
 export default Services;
 

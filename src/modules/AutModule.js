@@ -108,7 +108,8 @@ class AuthModule {
         
         return Promise.all([usernamePromise,useridPromise,imagePromise,servicesIdsPromise])
             .then(res => {
-                if(res && res[0] && res[1] && res[2] && res[3]){
+                // 4 params to delete
+                if(res && res.length === 4){
                     return true;
                 }
                 return false;
