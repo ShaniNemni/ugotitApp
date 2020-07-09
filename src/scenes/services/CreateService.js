@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import {View,Text,StyleSheet,KeyboardAvoidingView} from 'react-native';
+import {View,Text,StyleSheet,KeyboardAvoidingView,Image} from 'react-native';
 import {Icon} from 'native-base';
 import { PURPLE_BACKGROUND, BLACK, ERROR_BACKGROUND, ERROR_TEXT } from '../../utils/localStorage/colors/Colors';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -10,18 +10,23 @@ import { observer } from 'mobx-react';
 import rootStores from '../../stores/Index';
 import { SERVICE_STORE, ERROR_STORE } from '../../stores/Stores';
 import TimePicker from '../../component/timePicker/TimePicker';
+import { getImage } from '../../utils/images/Images';
 
 const placeholder = "service name";
 const buttonText = 'אישור';
 const hourTitle = 'טווח שעות';
 const serviceStore = rootStores[SERVICE_STORE];
 const errorStore = rootStores[ERROR_STORE];
-const CreateService = observer (({closeSubview,iosPlatform}) => {
+const loadingGif = getImage('loading');
+
+const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
 
     const [fromHour,setFromHour] = useState("00");
     const [fromMinutes,setFromMinutes] = useState("00");
     const [toHour,setToHour] = useState("00");
     const [toMinutes,setToMinutes] = useState("00");
+    const [overlapError,serOverlapError] = useState(undefined);
+    const [loading , setLoading] = useState(false);
 
     function changeTextInput() {
         const serviceName = serviceStore.getServiceName;
@@ -61,17 +66,30 @@ const CreateService = observer (({closeSubview,iosPlatform}) => {
 
     function displayError (){
         const errorMessage = errorStore.getErrorMessage;
+        const overlapDisplay = overlapError !== undefined;
         const displayErrorMessage = errorStore.getDisplayError;
-        console.log("displayErrorMessage ",displayErrorMessage);
-        if(displayErrorMessage) {
+
+        const errorMessageToDisplay = overlapDisplay ? overlapError : errorMessage;
+        if(displayErrorMessage || overlapDisplay) {
             return(
-                 <Text style={[styles.errorText]}>{errorMessage}</Text>
+                 <Text style={[styles.errorText]}>{errorMessageToDisplay}</Text>
             )
         }
     }
 
     function setServiceName(value) {
         serviceStore.setServiceName(value);
+    }
+
+    function renderLoading(){
+        if(loading) {
+            return(
+                <View style={{position:'absolute',top:'30%',alignContent:'center',zIndex:10}}>
+                    <Image source={loadingGif} style={{resizeMode:'center',width:100,height:100}} />
+                </View>
+            )
+        }
+        
     }
 
     function timePicker() {
@@ -90,6 +108,8 @@ const CreateService = observer (({closeSubview,iosPlatform}) => {
     }
 
     function checkServiceExistInTheSameHours() {
+        serOverlapError(undefined);
+        setLoading(true);
         const fromTime = fromHour + ":" + fromMinutes;
         const toTime = toHour + ":" + toMinutes;
         serviceStore.setFromTime(fromTime);
@@ -100,8 +120,7 @@ const CreateService = observer (({closeSubview,iosPlatform}) => {
                 if(!serviceTimeExist){
                     createNewService();
                 }else{
-                    errorStore.setDisplayError(true);
-                    errorStore.setErrorMessage("קיימת חפיפה עם זמני שירות אחרים");        
+                    serOverlapError("קיימת חפיפה עם זמני שירות אחרים");
                 }
             })
             .catch(err => {
@@ -111,7 +130,20 @@ const CreateService = observer (({closeSubview,iosPlatform}) => {
     }
 
     function createNewService() {
-        serviceStore.createService();
+        return serviceStore.createService()
+            .then(res => {
+                setLoading(false);
+                if(res) {
+                    closeSubview();
+                }else{
+                    errorStore.setDisplayError(true);
+                    errorStore.setErrorMessage("שגיאה בעת יצירת השירות");        
+                }
+            })
+            .catch(err => {
+                errorStore.setDisplayError(true);
+                errorStore.setErrorMessage("שגיאה בעת יצירת השירות");        
+            })
     }
 
     const closeIconByPlatform = iosPlatform ? "close-circle" : "closecircle";
@@ -133,7 +165,7 @@ const CreateService = observer (({closeSubview,iosPlatform}) => {
             <View style={{height:"16%"}}>
                 <WeekView/>
             </View>
-
+            {renderLoading()}
             <View style={{height:"40%"}}>
                 <Text style={[styles.hourTitle]}>{hourTitle}</Text>
                 {timePicker()}
