@@ -34,7 +34,7 @@ const options = {
 
   
 
-const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage,iconType}) => {
+const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage,iconType,setLoading}) => {
 
     useEffect(() => {
         //console.log("USE EFFECT !")
@@ -53,7 +53,6 @@ const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage,iconTyp
 
    const showImagePicker = () => {
        const didntSelectProfileImage = !profileImageExist;
-       console.log("didntSelectProfileImage ",didntSelectProfileImage);
        displayErrorMessage(false);
 
        ImagePicker.showImagePicker(options, (response) => {
@@ -67,6 +66,7 @@ const ProfileImage = ({profileImageExist,profileImage,iconName,saveImage,iconTyp
               errorMessageDisplay = 'שגיאה בעת העלאת התמונה';
               displayErrorMessage(true,errorMessageDisplay);
             } else if(imageValidation(response.type)){
+              setLoading(true);
               const source = { uri: response.uri };
               saveImage(source);
             }

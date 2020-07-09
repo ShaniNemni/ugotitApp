@@ -1,10 +1,10 @@
 import React,{Component,useState,useEffect} from 'react';
-import {View,Text,TouchableOpacity,StyleSheet,Platform} from 'react-native';
+import {View,Text,TouchableOpacity,StyleSheet,Platform,Image} from 'react-native';
 import ProfileImage from '../../component/profileImage/ProfileImage';
 import ErrorDisplay from '../../component/errorDisplay/ErrorDisplay';
 import { observer,inject } from 'mobx-react';
 import rootStores from '../../stores/Index';
-import { ERROR_STORE } from '../../stores/Stores';
+import { ERROR_STORE, SERVICE_STORE } from '../../stores/Stores';
 import CustomTextInput from '../../component/costumTextInput/CustomTextInput';
 import { WHITE_COLOR } from '../../utils/localStorage/colors/Colors';
 import AuthModule from '../../modules/AutModule';
@@ -13,11 +13,16 @@ import CustomButton from '../../component/customButton/CustomButton';
 import SCENCE_KEYS from '../scenesManager/SceneConsts';
 import { GradientHeader } from '../../component/customHeader/CustomHeader';
 
+//STORES
 const errorStore = rootStores[ERROR_STORE];
+const serviceStore = rootStores[SERVICE_STORE];
+//TITLE CONSTS
 const YOUR_NAME_PLACEHOLDER = 'איך קוראים לך?';
 const create_button_text = 'יצירת עובד';
 const update_button_text = 'עדכון עובד';
+//IMAGES
 const defaultImage = getImage('defaultProfile');
+const loadingGif = getImage('loading');
 
 const Profile = observer (({navigation}) => {
 
@@ -26,6 +31,7 @@ const Profile = observer (({navigation}) => {
     const [profileImageExist,setImageProfileExist] = useState(false);
     const [userExist,setUserExist] = useState(false);
     const [iconName,setIconName] = useState('plus');
+    const [loading,setLoading] = useState(false);
 
     useEffect(() => {
          AuthModule.getWorkerInfoFromLocalStorage()
@@ -72,10 +78,22 @@ const Profile = observer (({navigation}) => {
         }
     }
 
+    function renderLoading(){
+        if(loading) {
+            return(
+                <View style={{position:'absolute',top:'30%',alignContent:'center'}}>
+                    <Image source={loadingGif} style={{resizeMode:'center',width:100,height:100}} />
+                </View>
+            )
+        }
+        
+    }
+
     function saveImage (source){
          setIconName('pencil');
          setProfileImage(source);
          setImageProfileExist(true);
+         setLoading(false);
     }
 
     function validForm(){
@@ -83,11 +101,19 @@ const Profile = observer (({navigation}) => {
     }
 
     function onCustomButtonPressed(){
+        setLoading(true);
         return AuthModule.createOrUpdateWorker(username,profileImage)
             .then(res => {
                 console.log("createWorker res ",res);
                 if(res) {
-                    navigation.navigate(SCENCE_KEYS.SERVICES)
+                    serviceStore.initServices()
+                        .then(() => {
+                            setLoading(false);
+                            navigation.navigate(SCENCE_KEYS.SERVICES)
+                        })
+                        .catch(err => {
+                            console.log("error with init services ",err);
+                        })
                 }
             })
             .catch(err => {
@@ -103,11 +129,12 @@ const Profile = observer (({navigation}) => {
             <GradientHeader navigation={navigation} scenceName={SCENCE_KEYS.PROFILE}/>
             <View style={styles.profileView}>
                 <View style={[styles.profilePosition]}>
-                    <ProfileImage saveImage={saveImage} iconType={iconTypeByPlatform} iconName={iconName} profileImage={profileImage} profileImageExist={profileImageExist}/>
+                    <ProfileImage saveImage={saveImage} setLoading={setLoading} iconType={iconTypeByPlatform} iconName={iconName} profileImage={profileImage} profileImageExist={profileImageExist}/>
                 </View>
                 <View style={{marginVertical:'40%'}}>
                     <CustomTextInput placeholder={placeholder} onChangeText={text => onUsernameChange(text)}/>
                 </View>
+                {renderLoading()}
                 <View style={[styles.buttonPosition]}>
                     <CustomButton onPress={onCustomButtonPressed} disabled={!validForm()} buttonText={buttonText}/>
                 </View>
