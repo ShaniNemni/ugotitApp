@@ -5,8 +5,11 @@ import {TouchableOpacity,View,Text,StyleSheet,Platform} from 'react-native';
 import {Icon} from 'native-base';
 import { BLACK, GRAY_TEXT, PURPLE_BACKGROUND } from '../../utils/localStorage/colors/Colors';
 import HelperMethods from '../../utils/HelperMethos';
+import rootStores from '../../stores/Index';
+import { SERVICE_STORE } from '../../stores/Stores';
 
-const ServiceItem = ({service,removeServiceItem}) => {
+const serviceStore = rootStores[SERVICE_STORE];
+const ServiceItem = ({service,removeServiceItem,openSubView}) => {
     const getTime = () => {
         const time = service.from + "-" + service.to;
         const timeString = "שעות:" + time;
@@ -27,12 +30,17 @@ const ServiceItem = ({service,removeServiceItem}) => {
     const onTrashPressed = () => {
         const serviceId = service.id;
         console.log("serviceid ",serviceId);
-        removeServiceItem(serviceId)
+        //removeServiceItem(serviceId)
+    }
+
+    const onServicePressed = () => {
+        serviceStore.setServiceToUpdate(service)        
+        openSubView();
     }
 
     const iconTypeByPlatform = Platform.OS === 'ios' ? "MaterialCommunityIcons" : "Entypo";
     return(
-        <TouchableOpacity style={[styles.serviceView]}>
+        <TouchableOpacity onPress={() => onServicePressed()} style={[styles.serviceView]}>
             <View style={[styles.lockView]}>
                  <Icon name={"lock"} type={iconTypeByPlatform} style={styles.lockIcon}/>
             </View>

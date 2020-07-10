@@ -13,10 +13,10 @@ const serviceStore = rootStores[SERVICE_STORE];
 const noServicesToDisplay = 'אין שירותים';
 const loadingGif = getImage('loading');
 
-const ServiceList = observer (({}) => {
+const ServiceList = observer (({openSubView}) => {
     
     const renderServiceItem = ({item}) => {
-        return <ServiceItem removeServiceItem={removeServiceItem} service={item}/>
+        return <ServiceItem openSubView={openSubView} removeServiceItem={removeServiceItem} service={item}/>
     }
 
     const removeServiceItem = (serviceID) => {
@@ -30,7 +30,6 @@ const ServiceList = observer (({}) => {
     const renderByServicesCount = () => {
         const services = serviceStore.getAllServices;
         const loadingServices = serviceStore.getLoading;
-        console.log("loadingServices ---- ",loadingServices);
         if(loadingServices) {
             return (
                  <View style={{position:'absolute',top:'30%',alignContent:'center',alignSelf:'center'}}>

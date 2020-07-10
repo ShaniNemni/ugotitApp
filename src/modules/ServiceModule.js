@@ -20,20 +20,27 @@ class ServiceModule {
 
     }
 
-    createOrUpdateService = (body) => {
+    createOrUpdateService = (body,needToUpdate) => {
         return this.server.post(CREATE_OR_UPDATE_SERVICE,body)
             .then(res => {
                 if(res && res.status === 200) {
-                    const serviceId = res.data.id;
-                    return this.setServiceIDToLocalStorage(serviceId)
-                        .then(() => {
-                            return true;
-                        })
-                        .catch(err=> {
-                            console.log("error with set service id to localstorage ",err);
-                            throw false;
-                        })
+                    const serviceId = res.data.id; 
+                    if(!needToUpdate){
+                        return this.setServiceIDToLocalStorage(serviceId)
+                            .then(() => {
+                                return true;
+                            })
+                            .catch(err=> {
+                                console.log("error with set service id to localstorage ",err);
+                                throw false;
+                            })
+                    }
+                    return true;
                 }
+            })
+            .catch(err => {
+                console.log("error with createOrUpdateService ",err);
+                throw err;
             })
     }
 

@@ -14,7 +14,8 @@ import { getImage } from '../../utils/images/Images';
 import { timerTypes } from '../../utils/Enums';
 
 const placeholder = "service name";
-const buttonText = 'אישור';
+const acceptButtonText = 'אישור';
+const updateButtonText = 'עדכן';
 const hourTitle = 'טווח שעות';
 const serviceStore = rootStores[SERVICE_STORE];
 const errorStore = rootStores[ERROR_STORE];
@@ -127,9 +128,24 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
         )
     }
 
-    function checkServiceExistInTheSameHours() {
+    function serviceToUpdate () {
+        return serviceStore.getCurrentServiceID; 
+    }
+
+    //if service exist, and we just want to update
+    // no need to check overlap
+    function onPressByServiceStatus () {
         serOverlapError(undefined);
         setLoading(true);
+
+        if(serviceToUpdate()) {
+            createNewService();
+        }else {
+            checkServiceExistInTheSameHours();
+        }
+    }
+
+    function checkServiceExistInTheSameHours() {
         const fromTime = fromHour + ":" + fromMinutes;
         const toTime = toHour + ":" + toMinutes;
         serviceStore.setFromTime(fromTime);
@@ -151,11 +167,12 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
     }
 
     function createNewService() {
-        return serviceStore.createService()
+        return serviceStore.createOrUpdateService()
             .then(res => {
                 setLoading(false);
                 if(res) {
                     errorStore.setErrorMessage("");
+                    serviceStore.clearAllServiceFields();
                     closeSubview();
                 }else{
                     errorStore.setDisplayError(true);
@@ -168,14 +185,20 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
             })
     }
 
+    function closeCreateService() {
+        serviceStore.clearAllServiceFields();
+        closeSubview();
+    }
+    
     const serviceName = serviceStore.getServiceName;
+    const buttonText = serviceToUpdate() ? updateButtonText : acceptButtonText;
     const closeIconByPlatform = iosPlatform ? "close-circle" : "closecircle";
     const closeTypeIconByPlatfrom = iosPlatform ? "Ionicons" : "AntDesign";
     const iconTypeByPlatform = iosPlatform ? "MaterialCommunityIcons" : "Entypo";
     const flexdirectionByPlatform = iosPlatform ? {flexDirection:'row'} : {flexDirection:'row-reverse'};
     return(
         <KeyboardAvoidingView behavior={iosPlatform ? "padding" : "height"} style={[styles.view]}>
-            <TouchableOpacity onPress={() => closeSubview()} style={[styles.iconView]}>
+            <TouchableOpacity onPress={() => closeCreateService()} style={[styles.iconView]}>
                 <Icon name={closeIconByPlatform} type={closeTypeIconByPlatfrom} style={styles.iconStyle}/>
             </TouchableOpacity>
 
@@ -195,7 +218,7 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
             </View>
             {displayError()}
             <View style={styles.buttonPosition}>
-                <CustomButton onPress={checkServiceExistInTheSameHours} disabled={!validServiceForm()} buttonText={buttonText}/>
+                <CustomButton onPress={onPressByServiceStatus} disabled={!validServiceForm()} buttonText={buttonText}/>
             </View>
         </View>
 
