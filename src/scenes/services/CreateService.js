@@ -29,6 +29,25 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
     const [overlapError,serOverlapError] = useState(undefined);
     const [loading , setLoading] = useState(false);
 
+    useEffect(() => {
+        errorStore.setErrorMessage("");
+        if(serviceStore.getCurrentServiceID) {
+            const getFromTime = serviceStore.getFromTime && serviceStore.getFromTime.split(":");
+            const getFromHour = getFromTime ? getFromTime[0] : "00";
+            const getFromMin = getFromTime ? getFromTime[1] : "00";
+
+            const getToTime = serviceStore.getFromTime && serviceStore.getToTime.split(":");
+            const getToHour = getToTime ? getToTime[0] : "00";
+            const getToMin = getToTime ? getToTime[1] : "00";
+
+            setFromHour(getFromHour);
+            setFromMinutes(getFromMin);
+            setToHour(getToHour);
+            setToMinutes(getToMin);
+            
+        }
+    }, []);
+
     function changeTextInput() {
         const serviceName = serviceStore.getServiceName;
         return serviceName && serviceName.length > 0;
@@ -96,13 +115,13 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
     function timePicker() {
         return(
             <View style={{flexDirection:'row',alignItems:'center',marginTop:10}}>
-            <TimePicker initTimeByType={timerTypes.TO_MIN} selectTime={setToMinutes}/>
+            <TimePicker initTime={toMinutes} selectTime={setToMinutes}/>
                 <Text style={styles.timeSeperate}>{":"}</Text>
-            <TimePicker initTimeByType={timerTypes.TO_HO} selectTime={setToHour} type={"hours"}/>
+            <TimePicker initTime={toHour} selectTime={setToHour} type={"hours"}/>
                 <Text style={styles.timeSeperate}>{"-"}</Text>
-            <TimePicker initTimeByType={timerTypes.FROM_MIN} selectTime={setFromMinutes}/>
+            <TimePicker initTime={fromMinutes} selectTime={setFromMinutes}/>
                 <Text style={styles.timeSeperate}>{":"}</Text>
-            <TimePicker initTimeByType={timerTypes.FROM_HO} selectTime={setFromHour} type={"hours"}/>
+            <TimePicker initTime={fromHour} selectTime={setFromHour} type={"hours"}/>
         </View>
 
         )
@@ -136,6 +155,7 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
             .then(res => {
                 setLoading(false);
                 if(res) {
+                    errorStore.setErrorMessage("");
                     closeSubview();
                 }else{
                     errorStore.setDisplayError(true);

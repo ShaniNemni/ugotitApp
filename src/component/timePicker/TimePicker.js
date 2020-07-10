@@ -1,13 +1,16 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import {View,TouchableOpacitiy,Text,ScrollView,StyleSheet} from 'react-native';
-import { render } from 'react-dom';
 import { LIGHT_GRAY_BACKGROUND, PURPLE_BACKGROUND, BLACK } from '../../utils/localStorage/colors/Colors';
 
 const minuts = ["00","15","30","45"];
-const TimePicker = ({type,selectTime}) => {
 
-    const [timeSelected,setTime] = useState("00");
+const TimePicker = ({type,selectTime,initTime}) => {
+    const [timeSelected,setTime] = useState(initTime);
 
+    useEffect(() => {
+        setTime(initTime);
+    }, [initTime])
+    
     const getTimeByType = () => {
         if(type === "hours") {
             let hoursList = [];
