@@ -1,21 +1,18 @@
 export default class HelperMethods {
     static dayValueHE(day) {
         switch(day) {
-            case 0:
-                return "א׳";
             case 1:
-                return "ב׳";
+                return "א׳";
             case 2:
-                return "ג׳";
+                return "ב׳";
             case 3:
-                return "ד׳";
+                return "ג׳";
             case 4:
-                return "ה";
+                return "ד׳";
             case 5:
-                return "ו׳";
+                return "ה";
             case 6:
-                return "ש";
-
+                return "ו׳";
         }
     }
 }
