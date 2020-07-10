@@ -4,6 +4,9 @@ import {LOCAL_STORAGE_KEYS} from '../utils/localStorage/LocalStorageKeys';
 import ServiceModule from '../modules/ServiceModule';
 export default class ServiceStore {
     @observable
+    currentServiceId = undefined;
+
+    @observable
     serviceName = "" ;
 
     @observable
@@ -27,6 +30,22 @@ export default class ServiceStore {
 
     constructor(){}
 
+    clearAllServiceFields = () => {
+        this.setCurrentServiceID(undefined);
+        this.setServiceName("");
+        this.setSelectedDays(observable([])); 
+        this.setFromTime(undefined);
+        this.setToTime(undefined);
+    }
+
+    setServiceToUpdate = (service) => {
+        this.setCurrentServiceID(service.id);
+        this.setServiceName(service.name);
+        this.setSelectedDays(service.days); 
+        this.setFromTime(service.from);
+        this.setToTime(service.to);
+    }
+
     initServices = () => {
         this.setLoading(true);
         return this.getUserId()
@@ -46,8 +65,8 @@ export default class ServiceStore {
         .then(servicesIdsRes => {
             let servicesObjects = [];
             if(servicesIdsRes && servicesIdsRes.length > 0){
-                servicedIdsArray = servicesIdsRes.split(",");
-                const promises = servicedIdsArray.map(serviceId => {
+                servicesIdsRes = servicesIdsRes.split(",");
+                const promises = servicesIdsRes.map(serviceId => {
                     const convertedServicedId = serviceId.replace(/['"]+/g,"");
                     let body = {worker:userId,id:convertedServicedId};
                     return ServiceModule.getServiceById(body)
@@ -81,6 +100,16 @@ export default class ServiceStore {
     @computed
     get getLoading(){
         return this.loadingService;
+    }
+
+    @action
+    setCurrentServiceID(serviceId) {
+        this.currentServiceId = serviceId;
+    }
+
+    @computed
+    get getCurrentServiceID(){
+        return this.currentServiceId;
     }
 
     @action
@@ -157,15 +186,21 @@ export default class ServiceStore {
    //// check if exist service in selected time ////
     checkServiceExist() {
        const from = this.getFromTime;
+       const to = this.getToTime;
        const days = this.getSelectedDays;   
        const userId = this.userID;   
 
-       const body = {worker:userId,from,days};
-       return ServiceModule.checkServiceTimeExist(body)
-           .then(res => {
-               console.log("checkServiceTimeExist res ",res);
-               return res;
-           })
+       const bodyFrom = {worker:userId,from,days};
+       const bodyTo = {worker:userId,to,days};
+
+       //return true if overlap exist
+       const checkFromOverlap = ServiceModule.checkServiceTimeExist(bodyFrom);
+       const checkToOverlap = ServiceModule.checkServiceTimeExist(bodyTo);
+
+       return Promise.all([checkFromOverlap,checkToOverlap])
+            .then(res => {
+                return res[0] && res[1];
+            })
            .catch(() => {
                return false;
            })
@@ -180,7 +215,6 @@ export default class ServiceStore {
         const userId = this.userID;    
 
         const body = {worker:userId,name:serviceName,days,from,to};
-        console.log("BODY ---- ",body);
         return ServiceModule.createOrUpdateService(body)
             .then(res => {
                 if(res) {
