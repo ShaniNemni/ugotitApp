@@ -2,9 +2,19 @@ import React,{useEffect,useState} from 'react';
 import {View,Text,TouchableOpacity,StyleSheet,ScrollView} from 'react-native';
 import { GRAY_BACKGROUND, PURPLE_BACKGROUND } from '../../utils/localStorage/colors/Colors';
 
-const DayView = ({day,onSelectedDays}) => {
+const DayView = ({day,onSelectedDays,selectedDays,serviceToUpdate}) => {
     
     const [daySelected,setDaySelected] = useState(day.selected);
+    useEffect(() => {
+        if(serviceToUpdate) {
+            //if -1 , index not exist , so the day not selected
+            const findIfSelected = selectedDays && selectedDays.length > 0 && selectedDays.findIndex(selected => selected === day.id);
+            const selectedSign = findIfSelected !== -1;
+    
+            setDaySelected(selectedSign);
+        }
+    }, [selectedDays])
+
 
     function getSelectionStyle (){
         return daySelected ? styles.selectedCircle : styles.unselectedCircle;
