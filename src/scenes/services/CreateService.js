@@ -1,4 +1,4 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import {View,Text,StyleSheet,KeyboardAvoidingView,Image} from 'react-native';
 import {Icon} from 'native-base';
 import { PURPLE_BACKGROUND, BLACK, ERROR_BACKGROUND, ERROR_TEXT } from '../../utils/localStorage/colors/Colors';
@@ -11,6 +11,7 @@ import rootStores from '../../stores/Index';
 import { SERVICE_STORE, ERROR_STORE } from '../../stores/Stores';
 import TimePicker from '../../component/timePicker/TimePicker';
 import { getImage } from '../../utils/images/Images';
+import { timerTypes } from '../../utils/Enums';
 
 const placeholder = "service name";
 const buttonText = 'אישור';
@@ -95,13 +96,13 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
     function timePicker() {
         return(
             <View style={{flexDirection:'row',alignItems:'center',marginTop:10}}>
-            <TimePicker selectTime={setToMinutes}/>
+            <TimePicker initTimeByType={timerTypes.TO_MIN} selectTime={setToMinutes}/>
                 <Text style={styles.timeSeperate}>{":"}</Text>
-            <TimePicker selectTime={setToHour} type={"hours"}/>
+            <TimePicker initTimeByType={timerTypes.TO_HO} selectTime={setToHour} type={"hours"}/>
                 <Text style={styles.timeSeperate}>{"-"}</Text>
-            <TimePicker selectTime={setFromMinutes}/>
+            <TimePicker initTimeByType={timerTypes.FROM_MIN} selectTime={setFromMinutes}/>
                 <Text style={styles.timeSeperate}>{":"}</Text>
-            <TimePicker selectTime={setFromHour} type={"hours"}/>
+            <TimePicker initTimeByType={timerTypes.FROM_HO} selectTime={setFromHour} type={"hours"}/>
         </View>
 
         )
@@ -121,6 +122,7 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
                     createNewService();
                 }else{
                     serOverlapError("קיימת חפיפה עם זמני שירות אחרים");
+                    setLoading(false);
                 }
             })
             .catch(err => {
@@ -146,6 +148,7 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
             })
     }
 
+    const serviceName = serviceStore.getServiceName;
     const closeIconByPlatform = iosPlatform ? "close-circle" : "closecircle";
     const closeTypeIconByPlatfrom = iosPlatform ? "Ionicons" : "AntDesign";
     const iconTypeByPlatform = iosPlatform ? "MaterialCommunityIcons" : "Entypo";
@@ -158,7 +161,7 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
 
         <View style={{alignItems:'center',height:'80%',width:'100%'}}>
             <View style={[{marginTop:'2%',height:'20%'},flexdirectionByPlatform]}>
-                <CustomTextInput changeTextInputStyle={changeTextInput()} onChangeText={text => setServiceName(text)} placeholder={placeholder} width={'60%'}/>
+                <CustomTextInput defaultValue={serviceName} changeTextInputStyle={changeTextInput()} onChangeText={text => setServiceName(text)} placeholder={placeholder} width={'60%'}/>
                 <Icon name={"lock"} type={iconTypeByPlatform} style={{marginHorizontal:10}}/>
             </View>
 
