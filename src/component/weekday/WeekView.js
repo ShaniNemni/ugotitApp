@@ -21,8 +21,6 @@ const WeekView = observer (() => {
     const onSelectedDays = (dayId) => {
         let filteredSelectedDays = selectedDays;
         const dayIndex = filteredSelectedDays.findIndex(selected => selected === dayId);
-        console.log("onSelectedDays dayIndex ",dayIndex);
-        console.log("*** onSelectedDays filteredSelectedDays ",filteredSelectedDays);
 
         if(dayIndex === -1) {
             filteredSelectedDays.push(dayId);
@@ -31,12 +29,10 @@ const WeekView = observer (() => {
         }
         
         setSelectedDays(filteredSelectedDays);
-        console.log("onSelectedDays setSelectedDays ",selectedDays);
         serviceStore.setSelectedDays(filteredSelectedDays);
     }
 
     const renderWeek = () => {
-        console.log("onSelectedDays selectedDays sent !!! ",selectedDays);
         const dayToDisplay = DayList.map(dayElement => (
             <DayView selectedDays={selectedDays} onSelectedDays={onSelectedDays} key={dayElement.id} day={dayElement}/>
         ))

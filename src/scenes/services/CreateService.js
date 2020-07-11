@@ -31,6 +31,7 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
     const [loading , setLoading] = useState(false);
 
     useEffect(() => {
+        console.log("CreateService use effect ");
         errorStore.setErrorMessage("");
         if(serviceStore.getCurrentServiceID) {
             const getFromTime = serviceStore.getFromTime && serviceStore.getFromTime.split(":");
@@ -137,6 +138,7 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
     function onPressByServiceStatus () {
         serOverlapError(undefined);
         setLoading(true);
+        setTimeInStore();
 
         if(serviceToUpdate()) {
             createNewService();
@@ -145,12 +147,14 @@ const CreateService = observer (({closeSubview,iosPlatform,navigation}) => {
         }
     }
 
-    function checkServiceExistInTheSameHours() {
+    function setTimeInStore() {
         const fromTime = fromHour + ":" + fromMinutes;
         const toTime = toHour + ":" + toMinutes;
         serviceStore.setFromTime(fromTime);
         serviceStore.setToTime(toTime);
+    } 
 
+    function checkServiceExistInTheSameHours() {
         return serviceStore.checkServiceExist()
             .then(serviceTimeExist => {
                 if(!serviceTimeExist){

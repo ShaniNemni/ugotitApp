@@ -86,7 +86,8 @@ export default class ServiceStore {
                     })
             }
             //in case no services from local storage
-            this.setLoading(false)
+            this.setLoading(false);
+            this.setServices([]);
         })
 
     }
@@ -119,7 +120,6 @@ export default class ServiceStore {
 
     @computed
     get getAllServices(){
-        console.log("getAllServices this.services ",toJS(this.services))
         return toJS(this.services);
     }
 
@@ -138,7 +138,6 @@ export default class ServiceStore {
     @action
     setSelectedDays(serviceDays){
         this.selectedServiceDays.replace(serviceDays);
-        console.log("this.selectedServiceDays ",toJS(this.selectedServiceDays));
     }
 
     @computed
@@ -222,7 +221,6 @@ export default class ServiceStore {
             body = {worker:userId,name:serviceName,days,from,to};
         }
 
-        console.log("BODY --- ",body);
         return ServiceModule.createOrUpdateService(body,needToUpdate)
             .then(res => {
                 if(res) {
