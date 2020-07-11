@@ -45,7 +45,7 @@ const ServiceItem = ({service,removeServiceItem,openSubView}) => {
                  <Icon name={"lock"} type={iconTypeByPlatform} style={styles.lockIcon}/>
             </View>
             <View style={{height:40,width:150,flexDirection:'column'}}>
-                <Text style={[styles.serviceTitle]}>{service.name}</Text>
+                <Text numberOfLines={1} style={[styles.serviceTitle]}>{service.name}</Text>
                 <View style={[styles.timeInfo]}>
                     <Text numberOfLines={1} style={[styles.timeText]}>{getDays()}</Text>
                     <Text>{", "}</Text>
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
         fontSize:18,
         fontWeight:'bold',
         textAlign:'right',
-        alignSelf:'flex-start'
+        alignSelf:'flex-start',
     },
     timeInfo:{
         flexDirection:'row',
