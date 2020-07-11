@@ -83,7 +83,7 @@ const Services = observer(({navigation}) => {
     const styleByPlatform = iosPlatform ? styles.iosButtonView : styles.androidButtonView;
     return(
         <View style={[styles.view]}>
-            <GradientHeader scenceName={SCENCE_KEYS.SERVICES}/>
+            <GradientHeader displayOpacitiy={!isHidden} scenceName={SCENCE_KEYS.SERVICES}/>
             <View style={[styles.serviceView]}>
                 <View style={{height:'58%',alignSelf:'flex-start',width:'100%'}}>
                     <ServiceList openSubView = {toggleCreateService}/>

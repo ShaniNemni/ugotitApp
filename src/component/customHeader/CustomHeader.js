@@ -4,11 +4,12 @@ import {View,Text,StyleSheet} from 'react-native';
 import { WHITE_COLOR } from '../../utils/localStorage/colors/Colors';
 import SCENCE_KEYS from '../../scenes/scenesManager/SceneConsts';
 
-export const GradientHeader = ({scenceName,navgiation})=>  {
+export const GradientHeader = ({scenceName,displayOpacitiy})=>  {
     const displayText = scenceName === SCENCE_KEYS.SERVICES;
     const title = 'שירותים';
+    const opacitiyView = displayOpacitiy ? {opacity:0.3} : undefined;
     return(
-      <View style={styles.container}>
+      <View style={[styles.container,opacitiyView]}>
         <LinearGradient
           colors={["#8B37FF","#EE00C8"]}
           start={{ x: 0, y: 1 }}end={{ x: 1, y: 1 }}
