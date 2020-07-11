@@ -207,15 +207,23 @@ export default class ServiceStore {
 
     }
 
-    createService() {
+    createOrUpdateService() {
+        let body = undefined;
         const from = this.getFromTime;
         const to = this.getToTime;
         const serviceName = this.getServiceName;
         const days = this.getSelectedDays; 
-        const userId = this.userID;    
+        const userId = this.userID;   
+        const serviceId = this.getCurrentServiceID;
+        const needToUpdate = serviceId !== undefined;
+        if(serviceId) {
+            body = {id:serviceId,worker:userId,name:serviceName,days,from,to};
+        }else{
+            body = {worker:userId,name:serviceName,days,from,to};
+        }
 
-        const body = {worker:userId,name:serviceName,days,from,to};
-        return ServiceModule.createOrUpdateService(body)
+        console.log("BODY --- ",body);
+        return ServiceModule.createOrUpdateService(body,needToUpdate)
             .then(res => {
                 if(res) {
                  return this.getServices()
