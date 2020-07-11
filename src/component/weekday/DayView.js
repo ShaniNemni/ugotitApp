@@ -4,15 +4,13 @@ import { GRAY_BACKGROUND, PURPLE_BACKGROUND } from '../../utils/localStorage/col
 
 const DayView = ({day,onSelectedDays,selectedDays,serviceToUpdate}) => {
     
-    const [daySelected,setDaySelected] = useState(day.selected);
-    useEffect(() => {
-        if(serviceToUpdate) {
-            //if -1 , index not exist , so the day not selected
-            const findIfSelected = selectedDays && selectedDays.length > 0 && selectedDays.findIndex(selected => selected === day.id);
-            const selectedSign = findIfSelected !== -1;
+    const [daySelected,setDaySelected] = useState(false);
     
+    useEffect(() => {
+            //if -1 , index not exist , so the day not selected
+            const findIfSelected = selectedDays && selectedDays.length > 0 ? selectedDays.findIndex(selected => selected === day.id) : -1; 
+            const selectedSign = findIfSelected !== -1;
             setDaySelected(selectedSign);
-        }
     }, [selectedDays])
 
 
@@ -24,7 +22,7 @@ const DayView = ({day,onSelectedDays,selectedDays,serviceToUpdate}) => {
         const daySelectedValue = !daySelected;
         const dayId = day.id;
         setDaySelected(daySelectedValue);
-        onSelectedDays(daySelectedValue,dayId)
+        onSelectedDays(dayId)
     }
 
     return(

@@ -4,64 +4,41 @@ import DayView from './DayView';
 import rootStores from '../../stores/Index';
 import { SERVICE_STORE } from '../../stores/Stores';
 import { observer } from 'mobx-react';
+import {DayList} from '../../utils/lists/DayList';
 
-
-const daysList = [{id:1,name:'ראשון',selected:false},{id:2,name:'שני',selected:false},{id:3,name:'שלישי',selected:false},{id:4,name:'רביעי',selected:false},{id:5,name:'חמישי',selected:false},{id:6,name:'שישי',selected:false}]
 const serviceStore = rootStores[SERVICE_STORE];
 
 const WeekView = observer (() => {
-    const [days,setDays] = useState(daysList);
-    const [selectedDays,setSelectedDaysFromService] = useState([]);
-    const [serviceToUpdate,setServiceForUpdate] = useState(false);
-    console.log("WEEKVIEW - setSelectedDays days ",days);
+    const [selectedDays,setSelectedDays] = useState([]);
 
     useEffect(() => {
         if(serviceStore.getCurrentServiceID) {
             const selectedDaysToDisplay = serviceStore.getSelectedDays;
-            const daysValue  = daysList.slice();
-            console.log("WEEKVIEW - daysValue",daysValue);
-
-            selectedDaysToDisplay && selectedDaysToDisplay.map(selected => {
-                daysValue.map(dayElement => {
-                    if(selected === dayElement.id){
-                        dayElement.selected = true;
-                    }
-                }) 
-            }) 
-
-            setDays(daysValue);
-            setSelectedDaysFromService(selectedDaysToDisplay);
-            setServiceForUpdate(true);
-        }else{
-            console.log("** WEEKVIEW - setSelectedDays daysList ",daysList);
-            setDays(daysList);
-            console.log("** WEEKVIEW - setSelectedDays days ",days);
+            setSelectedDays(selectedDaysToDisplay);
         }
     }, [selectedDays]);
 
-    const onSelectedDays = (daySelectedValue,dayId) => {
-        const dayIndex = days.findIndex(dayElment => dayElment.id === dayId);
-        days[dayIndex].selected = daySelectedValue;
-        setDays(days);
-        console.log("2. SELELECTS DAYS ",days);
-        setSelectedDays();
-    }
+    const onSelectedDays = (dayId) => {
+        let filteredSelectedDays = selectedDays;
+        const dayIndex = filteredSelectedDays.findIndex(selected => selected === dayId);
+        console.log("onSelectedDays dayIndex ",dayIndex);
+        console.log("*** onSelectedDays filteredSelectedDays ",filteredSelectedDays);
 
-    const setSelectedDays = () => {
-        let idsDays = [];
+        if(dayIndex === -1) {
+            filteredSelectedDays.push(dayId);
+        }else{
+            filteredSelectedDays = selectedDays.filter(selected => dayId !== selected);
+        }
         
-        days.map(dayElemnt => {
-            if(dayElemnt.selected === true){
-                idsDays.push(dayElemnt.id);
-            }
-        });
-
-        serviceStore.setSelectedDays(idsDays);
+        setSelectedDays(filteredSelectedDays);
+        console.log("onSelectedDays setSelectedDays ",selectedDays);
+        serviceStore.setSelectedDays(filteredSelectedDays);
     }
 
     const renderWeek = () => {
-        const dayToDisplay = days.map(dayElement => (
-            <DayView serviceToUpdate={serviceToUpdate} selectedDays={selectedDays} onSelectedDays={onSelectedDays} key={dayElement.id} day={dayElement}/>
+        console.log("onSelectedDays selectedDays sent !!! ",selectedDays);
+        const dayToDisplay = DayList.map(dayElement => (
+            <DayView selectedDays={selectedDays} onSelectedDays={onSelectedDays} key={dayElement.id} day={dayElement}/>
         ))
 
         return(
