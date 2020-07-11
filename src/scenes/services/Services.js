@@ -56,6 +56,9 @@ const Services = observer(({navigation}) => {
         return AutModule.removeWorkerDataFromLocalStorage()
              .then(res => {
                  if(res) {
+                     errorStore.setErrorMessage("");
+                     errorStore.setDisplayError(false);
+                     serviceStore.clearAllServiceFields();
                      navigation.navigate(SCENCE_KEYS.PROFILE);
                  }else{
                     setErrorText("שגיאה בעת לחיצה על סיום")
