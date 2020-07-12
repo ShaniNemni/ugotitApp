@@ -63,16 +63,12 @@ export default class ServiceStore {
         const userId = this.userID;
         return ServiceModule.getServiceIdFromLocalStorage()
         .then(servicesIdsRes => {
-            const paresesServicedIds = JSON.parse(servicesIdsRes);
-            console.log("GET SERVICE paresesServicedIds ---- ",paresesServicedIds);
-            console.log("GET SERVICE typeof ---- ",typeof paresesServicedIds);
-
             let servicesObjects = [];
             let body = undefined;
-
-            if(paresesServicedIds && paresesServicedIds.length > 0){
+            
+            if(servicesIdsRes && servicesIdsRes.length > 0){
+                const paresesServicedIds = JSON.parse(servicesIdsRes);
                 const promises = paresesServicedIds.map(serviceId => {
-                    console.log("GET SERVICE ID ---- ",serviceId);
                     body = {worker:userId,id:serviceId};
                     return ServiceModule.getServiceById(body)
                         .then(serviceObject => {
@@ -87,6 +83,7 @@ export default class ServiceStore {
                     })
                     .catch(err => {
                         console.log("error with promise all services id ",err);
+                        this.setServices([]);
                         this.setLoading(false);
                     })
             }
