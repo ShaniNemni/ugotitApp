@@ -23,7 +23,7 @@ const ServiceList = observer (({openSubView}) => {
         console.log("serviceID ------- ",serviceID);
         return serviceStore.deleteService(serviceID) 
             .then(res => {
-                console.log("res ---------- ",res);
+                console.log("removeIdsFromLocalStorage res ---------- ",res);
             })
     }
 

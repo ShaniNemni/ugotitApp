@@ -1,15 +1,19 @@
 
-import React from 'react';
+import React,{useState} from 'react';
 import { observer } from 'mobx-react';
-import {TouchableOpacity,View,Text,StyleSheet,Platform} from 'react-native';
+import {TouchableOpacity,View,Text,StyleSheet,Platform,Modal} from 'react-native';
 import {Icon} from 'native-base';
 import { BLACK, GRAY_TEXT, PURPLE_BACKGROUND } from '../../utils/localStorage/colors/Colors';
 import HelperMethods from '../../utils/HelperMethos';
 import rootStores from '../../stores/Index';
 import { SERVICE_STORE } from '../../stores/Stores';
+import RemoveServiceModal from '../../component/modal/RemoveServiceModal';
+
 
 const serviceStore = rootStores[SERVICE_STORE];
 const ServiceItem = ({service,removeServiceItem,openSubView}) => {
+    const [removeServiceModal,setRemoveModalVisible] = useState(false);
+
     const getTime = () => {
         const time = service.from + "-" + service.to;
         const timeString = "שעות:" + time;
@@ -30,7 +34,7 @@ const ServiceItem = ({service,removeServiceItem,openSubView}) => {
     const onTrashPressed = () => {
         const serviceId = service.id;
         console.log("serviceid ",serviceId);
-        //removeServiceItem(serviceId)
+        removeServiceItem(serviceId)
     }
 
     const onServicePressed = () => {

@@ -63,12 +63,17 @@ export default class ServiceStore {
         const userId = this.userID;
         return ServiceModule.getServiceIdFromLocalStorage()
         .then(servicesIdsRes => {
+            const paresesServicedIds = JSON.parse(servicesIdsRes);
+            console.log("GET SERVICE paresesServicedIds ---- ",paresesServicedIds);
+            console.log("GET SERVICE typeof ---- ",typeof paresesServicedIds);
+
             let servicesObjects = [];
-            if(servicesIdsRes && servicesIdsRes.length > 0){
-                servicesIdsRes = servicesIdsRes.split(",");
-                const promises = servicesIdsRes.map(serviceId => {
-                    const convertedServicedId = serviceId.replace(/['"]+/g,"");
-                    let body = {worker:userId,id:convertedServicedId};
+            let body = undefined;
+
+            if(paresesServicedIds && paresesServicedIds.length > 0){
+                const promises = paresesServicedIds.map(serviceId => {
+                    console.log("GET SERVICE ID ---- ",serviceId);
+                    body = {worker:userId,id:serviceId};
                     return ServiceModule.getServiceById(body)
                         .then(serviceObject => {
                             servicesObjects.push(serviceObject);
@@ -91,6 +96,41 @@ export default class ServiceStore {
         })
 
     }
+
+
+
+    // getServices = () => {
+    //     const userId = this.userID;
+    //     return ServiceModule.getServiceIdFromLocalStorage()
+    //     .then(servicesIdsRes => {
+    //         let servicesObjects = [];
+    //         if(servicesIdsRes && servicesIdsRes.length > 0){
+    //             servicesIdsRes = servicesIdsRes.split(",");
+    //             const promises = servicesIdsRes.map(serviceId => {
+    //                 const convertedServicedId = serviceId.replace(/['"]+/g,"");
+    //                 let body = {worker:userId,id:convertedServicedId};
+    //                 return ServiceModule.getServiceById(body)
+    //                     .then(serviceObject => {
+    //                         servicesObjects.push(serviceObject);
+    //                     })
+    //             });
+
+    //             return Promise.all(promises)
+    //                 .then(() => {
+    //                     this.setServices(servicesObjects);
+    //                     this.setLoading(false);
+    //                 })
+    //                 .catch(err => {
+    //                     console.log("error with promise all services id ",err);
+    //                     this.setLoading(false);
+    //                 })
+    //         }
+    //         //in case no services from local storage
+    //         this.setLoading(false);
+    //         this.setServices([]);
+    //     })
+
+    // }
 
     //// set loading ////
     @action
@@ -248,18 +288,17 @@ export default class ServiceStore {
 
         return ServiceModule.deleteService(body)
             .then(res => {
-                console.log("res deleteService ",res);
                 if(res) {
                     return this.getServices()
                         .catch(err => {
-                            console.log(" error with getServices ",err)
+                            console.log(" error with getServices ",err);
                         })
                 }
                 return res;
             })
             .catch(err => {
                 console.log("error with delete service ",err);
-                throw err;
+                return false;
             })
     }
 

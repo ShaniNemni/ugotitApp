@@ -45,17 +45,20 @@ class ServiceModule {
     }
 
     deleteService = (body) => {
-        // console.log("body ----- ",body);
-        // return this.server.post(DELETE_SERVICE,body)
-        //     .then(res => {
-        //         console.log("deleteService ------ ",res);
-        //         if(res && res.status === 200) {
-        //             const serviceId = body.id;
-                    return this.removeIdsFromLocalStorage(body.id)
+         return this.server.post(DELETE_SERVICE,body)
+            .then(res => {
+                if(res && res.status === 200) {
+                    const serviceId = body.id;
+                    return this.removeIdsFromLocalStorage(serviceId)
                         .catch(err => {
                             console.log("error with delete services ",err);
                         })
             
+         }})
+         .catch(err => {
+             console.log("error with delete service ",err);
+             throw err;
+         })
     }
 
     getServiceById = (body) => {
@@ -88,69 +91,41 @@ class ServiceModule {
     setServiceIDToLocalStorage = (serviceId) => {
         return this.getServiceIdFromLocalStorage()
             .then(res => {
-                let storedIds;
+                let storedIds = undefined;
                 if(res && res.length > 0) {
                     storedIds = JSON.parse(res);
-                    storedIds += `,${serviceId}`;
-                    
+                    storedIds.push(serviceId);
                 }else{
-                    storedIds = serviceId;
+                    storedIds = [serviceId];
                 }
-                
-                let stringifyIDs = JSON.stringify(storedIds);
-                console.log("stringifyIDs ---- ",stringifyIDs);
+
+                let stringifyIDs = JSON.stringify(storedIds)
                 return LocalStorage.setItem(LOCAL_STORAGE_KEYS.SERVICES_IDS,stringifyIDs)
                     .catch(err => {
                         console.log("error with set IDs ",err);
                     })
-            })  
-    }
 
-    setServiceIdsListToLocalStorage = (services) => {
-        console.log("SET services ",services);
-        let stringifyIDs = JSON.stringify(services);
-        console.log("SET  stringifyIDs ",stringifyIDs);
-        return LocalStorage.setItem(LOCAL_STORAGE_KEYS.SERVICES_IDS,stringifyIDs)
-            .catch(err => {
-                console.log("error with set services list ",err);
             })
     }
-
 
     removeIdsFromLocalStorage = (serviceId) => {
         return this.getServiceIdFromLocalStorage()
             .then(res => {
-                const servicedIdsArray = res.split(",");
-                let serviceConverted = undefined;
-                const servicesFilter = servicedIdsArray.filter(service => {
-                    serviceConverted = service.replace(/['"]+/g,"");
-                    console.log("service ",service);
-                    console.log("serviceConverted ",serviceConverted);
-                    if(serviceId !== serviceConverted) {
-                        return serviceConverted;
-                    }
-                    ["1,2"]
-                })
+                const servicedIdsArrayParsed = JSON.parse(res);
+                const servicesFilter = servicedIdsArrayParsed.filter(serviceElementID => serviceElementID !== serviceId);
+                const stringifyIDs = JSON.stringify(servicesFilter);
 
-                console.log("** servicesFilter ",servicesFilter);
-                let stringifyIDs = JSON.stringify(servicesFilter);
-                console.log("SET  stringifyIDs ",stringifyIDs);
-                console.log("SET  stringifyIDs ",stringifyIDs);
-
-        
-                return false;
-                // return this.setServiceIdsListToLocalStorage(JSservices)
-                //     .then(() => {
-                //         console.log("SET SERVICES ----- TRUE ")
-                //         return true;
-                //     })
-                //     .catch(err => {
-                //         console.log("error with setServiceIdsListToLocalStorage ",err);
-                //         return false;
-                //     })
+                return LocalStorage.setItem(LOCAL_STORAGE_KEYS.SERVICES_IDS,stringifyIDs)
+                    .then(() => {
+                        return true;
+                    })
+                    .catch(err => {
+                        console.log("error with setServiceIdsListToLocalStorage ",err);
+                        return false;
+                    })
             })
             .catch(err => {
-                console.log("error with remove ids from local storage ",err);
+                console.log("error with get service ids from local storage ",err);
                 return false;
             })
     }
