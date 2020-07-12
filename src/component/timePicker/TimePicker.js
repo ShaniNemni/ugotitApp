@@ -63,7 +63,7 @@ const TimePicker = ({type,selectTime,initTime}) => {
     }
 
     return(
-        <ScrollView contentContainerStyle={{alignItems:'center',marginVertical:2}} style={[styles.scrollView]}>
+        <ScrollView persistentScrollbar={true} contentContainerStyle={{alignItems:'center',marginVertical:2}} style={[styles.scrollView]}>
             {renderTimeView()}
         </ScrollView>
     )
