@@ -1,30 +1,51 @@
 
-import React from 'react';
+import React,{useState} from 'react';
 import { observer } from 'mobx-react';
-import {View,FlatList,Text,Image} from 'react-native';
+import {View,FlatList,Text,Image,StyleSheet} from 'react-native';
 import { render } from 'react-dom';
 import rootStores from '../../stores/Index';
-import { SERVICE_STORE } from '../../stores/Stores';
+import { SERVICE_STORE, ERROR_STORE } from '../../stores/Stores';
 import ServiceItem from './ServiceItem';
 import { getImage } from '../../utils/images/Images';
 import { GRAY_TEXT } from '../../utils/localStorage/colors/Colors';
+import ErrorDisplay from '../../component/errorDisplay/ErrorDisplay';
 
 const serviceStore = rootStores[SERVICE_STORE];
 const noServicesToDisplay = 'אין שירותים';
 const loadingGif = getImage('loading');
 
 const ServiceList = observer (({openSubView}) => {
-    
+    //loading for delete
+    const [loading,setLoading] = useState(false);
+    const [errorMessage,setErrorMessage] = useState("");
+
     const renderServiceItem = ({item}) => {
         return <ServiceItem openSubView={openSubView} removeServiceItem={removeServiceItem} service={item}/>
     }
 
     const removeServiceItem = (serviceID) => {
-        console.log("serviceID ------- ",serviceID);
+        setLoading(true);
+        setErrorMessage("");
         return serviceStore.deleteService(serviceID) 
-            .then(res => {
-                console.log("removeIdsFromLocalStorage res ---------- ",res);
+            .then(() => {
+                setLoading(false);
+            }).
+            catch(err => {
+                setLoading(false);
+                setErrorMessage("שגיאה בעת מחיקת שירות");
+                console.log("error with remove service",err);
             })
+    }
+
+    const renderLoading = () =>{
+        if(loading) {
+            return(
+                <View style={{position:'absolute',top:'30%',alignContent:'center',alignSelf:'center'}}>
+                    <Image source={loadingGif} style={{resizeMode:'center',width:100,height:100}} />
+                </View>
+            )
+        }
+        
     }
 
     const renderByServicesCount = () => {
@@ -40,10 +61,13 @@ const ServiceList = observer (({openSubView}) => {
 
         if(services && services.length > 0) {
             return (
-                <FlatList
-                data={services}
-                renderItem = {renderServiceItem}
-                keyExtractor = {item => item.id}/>
+                <View style={{height:'90%'}}>
+                    <FlatList
+                    data={services}
+                    renderItem = {renderServiceItem}
+                    keyExtractor = {item => item.id}/>
+                    {renderLoading()}
+                </View>
             ) 
         }
 
@@ -55,11 +79,30 @@ const ServiceList = observer (({openSubView}) => {
 
     }
 
+    const displayErrorMessage = () => {
+        const displayError = errorMessage.length > 0;
+        if(displayError) {
+            return(
+                <View style={[styles.errorDisplay]}>
+                    <ErrorDisplay errorText={errorMessage}/> 
+                </View>
+            )
+        }
+    }
+
     return(
         <View style={{height:'100%'}}>
             {renderByServicesCount()}
+            {displayErrorMessage ()}
         </View>
       )
 })
 
 export default ServiceList;
+
+const styles = StyleSheet.create({
+    errorDisplay:{
+        position:'absolute',
+        bottom:-20
+    }
+})
